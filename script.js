@@ -220,6 +220,17 @@ registeredPlayers.forEach((player) => {
 });
 teamMembers.forEach((members, team) => teamMembers.set(team, [...members].sort((a, b) => a.localeCompare(b, 'es'))));
 
+const teamCaptains = {
+  'Monos Coruña':{player:'MNC Roicetee'},
+  Tarnished:{player:'TR alex132mini'},
+  'Maaa Nugueets':{player:'jadriab10'},
+  Chorbitos:{player:'Afelaino'}
+};
+const captainPlayers = new Set(Object.values(teamCaptains).map((captain) => captain.player));
+const captainBadge = (name) => captainPlayers.has(name)
+  ? '<span class="captain-badge" title="Capitán del equipo" aria-label="Capitán del equipo">★</span>'
+  : '';
+
 const riotProfiles = {
   eiboll:{tag:'eibol',status:'known'}, DrRedFlag:{tag:'EUW',status:'known'},
   'TR alex132mini':{tag:'ASF',status:'known'}, Panker:{tag:'MV3',status:'known'},
@@ -251,10 +262,15 @@ const soloQueueRanks = {
   SobrinoRelax:{tier:'Plata',division:4,lp:32}, ZaRg0t:{tier:'Platino',division:2,lp:44},
   sam:{tier:'Esmeralda',division:3,lp:89}
 };
+const soloQueuePeakRanks = {};
 const rankTiers = ['Hierro','Bronce','Plata','Oro','Platino','Esmeralda','Diamante','Maestro','Gran Maestro','Challenger'];
 const romanDivision = (division) => ['','I','II','III','IV'][division] || '';
 const rankScore = (rank) => (rankTiers.indexOf(rank.tier) * 400) + (rank.division ? (4 - rank.division) * 100 : 0) + rank.lp;
-const formatRank = (rank) => rank ? `${rank.tier}${rank.division ? ` ${romanDivision(rank.division)}` : ''}` : 'Pendiente';
+const formatRank = (rank) => {
+  if (!rank) return 'Pendiente';
+  const lp = rankTiers.indexOf(rank.tier) >= rankTiers.indexOf('Maestro') ? ` · ${rank.lp} LP` : '';
+  return `${rank.tier}${rank.division ? ` ${romanDivision(rank.division)}` : ''}${lp}`;
+};
 
 function formatAverageRank(score) {
   const tierIndex = Math.max(0, Math.min(rankTiers.length - 1, Math.floor(score / 400)));
@@ -279,17 +295,19 @@ function renderTeamRoster(members) {
   const {averageScore} = getTeamRankSummary(members);
   const rows = members.map((name) => {
     const rank = soloQueueRanks[name];
+    const peakRank = soloQueuePeakRanks[name];
     const player = playerStats.get(name) || {name};
-    return `<tr><td><a href="${opggUrl(player)}" target="_blank" rel="noopener">${name}<span>OP.GG ↗</span></a></td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td></tr>`;
+    return `<tr><td><a href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${name}${captainBadge(name)}</strong><span>OP.GG ↗</span></a></td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td class="${peakRank ? 'has-rank' : 'rank-pending'}">${formatRank(peakRank)}</td></tr>`;
   }).join('');
-  return `<div class="team-rank-summary"><span>Rango promedio · mejores 5</span><strong>${averageScore === null ? 'Pendiente' : formatAverageRank(averageScore)}</strong></div><div class="team-table-wrap"><table><thead><tr><th>Jugador</th><th>Rango SoloQ</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="team-rank-summary"><span>Rango promedio · mejores 5</span><strong>${averageScore === null ? 'Pendiente' : formatAverageRank(averageScore)}</strong></div><div class="team-table-wrap"><table><thead><tr><th>Jugador</th><th>Rango SoloQ</th><th>Peak SoloQ</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 document.querySelectorAll('.team-panel').forEach((card) => {
   const members = teamMembers.get(card.dataset.team) || [];
   const {averageScore} = getTeamRankSummary(members);
   const rank = averageScore === null ? 'Pendiente' : formatAverageRank(averageScore);
-  card.insertAdjacentHTML('beforeend', `<div class="team-panel-rank"><span>Rango promedio · mejores 5</span><strong>${rank}</strong></div>`);
+  const captain = teamCaptains[card.dataset.team];
+  card.insertAdjacentHTML('beforeend', `<div class="team-panel-rank"><span class="team-captain">★ Capitán · ${captain.player}</span><span>Rango promedio · mejores 5</span><strong>${rank}</strong></div>`);
 });
 const leaguePlayers = [...playerStats.values()].sort((a, b) => a.team.localeCompare(b.team, 'es') || a.name.localeCompare(b.name, 'es'));
 const average = (total, gamesPlayed) => gamesPlayed ? (total / gamesPlayed).toFixed(1) : '0.0';
@@ -317,8 +335,9 @@ function renderPlayers(list) {
   const rows = list.map((player) => {
     const picks = [...player.picks];
     const rank = soloQueueRanks[player.name];
+    const peakRank = soloQueuePeakRanks[player.name];
     const pickIcons = picks.map((champion) => `<span class="pick-icon" title="${champion}"><img src="${championIcon(champion)}" alt="${champion}"><small>${champion}</small></span>`).join('');
-    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${kdaRatio(player).toFixed(2)}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="player-win-rate">${formatWinRate(player)}</td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td>${player.games}</td><td><div class="player-picks">${pickIcons || 'Pendiente'}</div></td></tr>`;
+    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}${captainBadge(player.name)}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${kdaRatio(player).toFixed(2)}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="player-win-rate">${formatWinRate(player)}</td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td class="${peakRank ? 'has-rank' : 'rank-pending'}">${formatRank(peakRank)}</td><td>${player.games}</td><td><div class="player-picks">${pickIcons || 'Pendiente'}</div></td></tr>`;
   }).join('');
   const sortableHeader = (key, label) => {
     const active = playerSortState.key === key;
@@ -326,7 +345,7 @@ function renderPlayers(list) {
     const indicator = active ? (direction === 'asc' ? '▲' : '▼') : '↕';
     return `<th aria-sort="${active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}"><button type="button" class="table-sort${active ? ' active' : ''}" data-sort="${key}">${label}<span aria-hidden="true">${indicator}</span></button></th>`;
   };
-  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA')}${sortableHeader('winrate', '% Victoria')}${sortableHeader('rank', 'Rango SoloQ')}${sortableHeader('games', 'PJ')}<th>Picks</th></tr></thead><tbody>${rows}</tbody></table>`;
+  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA')}${sortableHeader('winrate', '% Victoria')}${sortableHeader('rank', 'Rango SoloQ')}${sortableHeader('peakRank', 'Peak SoloQ')}${sortableHeader('games', 'PJ')}<th>Picks</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 const playerSearch = document.querySelector('#player-search');
@@ -341,6 +360,7 @@ function updatePlayers() {
       team:[a.team, b.team], name:[a.name, b.name], kda:[kdaRatio(a), kdaRatio(b)],
       winrate:[winRate(a) ?? -1, winRate(b) ?? -1],
       rank:[soloQueueRanks[a.name] ? rankScore(soloQueueRanks[a.name]) : -1, soloQueueRanks[b.name] ? rankScore(soloQueueRanks[b.name]) : -1],
+      peakRank:[soloQueuePeakRanks[a.name] ? rankScore(soloQueuePeakRanks[a.name]) : -1, soloQueuePeakRanks[b.name] ? rankScore(soloQueuePeakRanks[b.name]) : -1],
       games:[a.games, b.games]
     }[playerSortState.key];
     const comparison = typeof values[0] === 'string' ? values[0].localeCompare(values[1], 'es') : values[0] - values[1];
