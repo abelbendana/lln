@@ -165,7 +165,22 @@ const games = [
       {name:'TR Adria Kila',champion:'Pantheon',kda:'4/9/1'}
     ]
   }},
-  {date:'13–26 octubre',a:'Monos Coruña',b:'Maaa Nugueets',winner:'Maaa Nugueets',week:'Jornada 4'},
+  {date:'13–26 octubre',a:'Monos Coruña',b:'Maaa Nugueets',winner:'Maaa Nugueets',week:'Jornada 4',duration:'37:52',lineups:{
+    'Monos Coruña':[
+      {name:'CANICHEMANIA63',champion:'Nasus',kda:'0/7/2'},
+      {name:'General Panza',champion:'Lillia',kda:'3/3/6'},
+      {name:'Tugoldobello',champion:'Naafiri',kda:'5/6/2'},
+      {name:'DrRedFlag',champion:'Twitch',kda:'5/3/6'},
+      {name:'MNC Roicetee',champion:'Nautilus',kda:'2/5/6'}
+    ],
+    'Maaa Nugueets':[
+      {name:'eiboll',champion:'Mordekaiser',kda:'4/1/2'},
+      {name:'JONI',champion:'Jarvan IV',kda:'4/2/11'},
+      {name:'jadriab10',champion:'Ahri',kda:'10/3/7'},
+      {name:'sam',champion:'Jinx',kda:'5/4/7'},
+      {name:'puminy',champion:'Milio',kda:'1/5/12'}
+    ]
+  }},
   {date:'13–26 octubre',a:'Tarnished',b:'Chorbitos',winner:'Tarnished',week:'Jornada 4',duration:'26:20',twitch:'https://www.twitch.tv/videos/2911664510',lineups:{
     'Tarnished':[
       {name:'TR alex132mini',champion:'Renekton',kda:'9/2/7'},
