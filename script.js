@@ -189,12 +189,13 @@ const games = [
 ];
 const teamMembers = new Map();
 const playerStats = new Map();
+const lineupRoles = ['top','jungle','mid','adc','support'];
 games.forEach((game) => {
   Object.entries(game.lineups || {}).forEach(([team, lineup]) => {
     const members = teamMembers.get(team) || new Set();
-    lineup.forEach((player) => {
+    lineup.forEach((player, roleIndex) => {
       members.add(player.name);
-      const stats = playerStats.get(player.name) || {name:player.name,team,games:0,wins:0,kills:0,deaths:0,assists:0,picks:new Set()};
+      const stats = playerStats.get(player.name) || {name:player.name,team,games:0,wins:0,kills:0,deaths:0,assists:0,picks:new Set(),roles:new Set()};
       const [kills, deaths, assists] = player.kda.split('/').map(Number);
       stats.games += 1;
       if (game.winner === team) stats.wins += 1;
@@ -202,6 +203,7 @@ games.forEach((game) => {
       stats.deaths += deaths;
       stats.assists += assists;
       if (player.champion) stats.picks.add(player.champion);
+      if (lineupRoles[roleIndex]) stats.roles.add(lineupRoles[roleIndex]);
       playerStats.set(player.name, stats);
     });
     teamMembers.set(team, members);
@@ -215,7 +217,7 @@ registeredPlayers.forEach((player) => {
   members.add(player.name);
   teamMembers.set(player.team, members);
   if (!playerStats.has(player.name)) {
-    playerStats.set(player.name, {name:player.name,team:player.team,games:0,wins:0,kills:0,deaths:0,assists:0,picks:new Set()});
+    playerStats.set(player.name, {name:player.name,team:player.team,games:0,wins:0,kills:0,deaths:0,assists:0,picks:new Set(),roles:new Set()});
   }
 });
 teamMembers.forEach((members, team) => teamMembers.set(team, [...members].sort((a, b) => a.localeCompare(b, 'es'))));
@@ -262,7 +264,21 @@ const soloQueueRanks = {
   SobrinoRelax:{tier:'Plata',division:4,lp:32}, ZaRg0t:{tier:'Platino',division:2,lp:44},
   sam:{tier:'Esmeralda',division:3,lp:89}
 };
-const soloQueuePeakRanks = {};
+const soloQueuePeakRanks = {
+  eiboll:{tier:'Diamante',division:1,lp:10}, DrRedFlag:{tier:'Diamante',division:4,lp:83},
+  'TR alex132mini':{tier:'Plata',division:2,lp:74}, Panker:{tier:'Maestro',lp:16},
+  CANICHEMANIA63:{tier:'Maestro',lp:42}, Afelaino:{tier:'Hierro',division:1,lp:84},
+  Bochi:{tier:'Esmeralda',division:2,lp:20}, jadriab10:{tier:'Esmeralda',division:2,lp:63},
+  puminy:{tier:'Diamante',division:3,lp:88}, 'MNC Roicetee':{tier:'Oro',division:4,lp:43},
+  Iontxas:{tier:'Oro',division:2,lp:2}, Tugoldobello:{tier:'Plata',division:2,lp:90},
+  'TR Adria Kila':{tier:'Platino',division:4,lp:41}, 'TR Markos316':{tier:'Oro',division:2,lp:47},
+  'MKOI Keiwocky':{tier:'Oro',division:2,lp:4}, 'General Panza':{tier:'Esmeralda',division:3,lp:6},
+  'TR Arkinos':{tier:'Esmeralda',division:4,lp:47}, 'TR Terminator':{tier:'Plata',division:2,lp:2},
+  Bolrich:{tier:'Diamante',division:1,lp:32}, Romera:{tier:'Maestro',lp:313},
+  'Nómada':{tier:'Esmeralda',division:4,lp:58}, SobrinoRelax:{tier:'Oro',division:2,lp:24},
+  ZaRg0t:{tier:'Esmeralda',division:4,lp:27}, JONI:{tier:'Plata',division:2,lp:15},
+  sam:{tier:'Esmeralda',division:2,lp:4}
+};
 const rankTiers = ['Hierro','Bronce','Plata','Oro','Platino','Esmeralda','Diamante','Maestro','Gran Maestro','Challenger'];
 const romanDivision = (division) => ['','I','II','III','IV'][division] || '';
 const rankScore = (rank) => (rankTiers.indexOf(rank.tier) * 400) + (rank.division ? (4 - rank.division) * 100 : 0) + rank.lp;
@@ -326,6 +342,17 @@ const riotIdLabel = (player) => {
   if (!profile) return '<span class="riot-id unresolved">Tag pendiente</span>';
   return `<span class="riot-id">#${profile.tag}</span>`;
 };
+const roleIcons = [
+  {key:'top',label:'Top',icon:'assets/roles/top.svg'},
+  {key:'jungle',label:'Jungla',icon:'assets/roles/jungle.svg'},
+  {key:'mid',label:'Mid',icon:'assets/roles/middle.svg'},
+  {key:'adc',label:'ADC',icon:'assets/roles/bottom.svg'},
+  {key:'support',label:'Support',icon:'assets/roles/utility.svg'}
+];
+const renderRoleIcons = (player) => `<div class="role-icons">${roleIcons.map((role) => {
+  const played = player.roles?.has(role.key);
+  return `<span class="role-icon${played ? ' is-played' : ''}" title="${role.label}${played ? ' · jugada' : ''}" aria-label="${role.label}${played ? ', jugada' : ', no jugada'}"><img src="${role.icon}" alt=""></span>`;
+}).join('')}</div>`;
 
 function renderPlayers(list) {
   if (!list.length) {
@@ -337,7 +364,7 @@ function renderPlayers(list) {
     const rank = soloQueueRanks[player.name];
     const peakRank = soloQueuePeakRanks[player.name];
     const pickIcons = picks.map((champion) => `<span class="pick-icon" title="${champion}"><img src="${championIcon(champion)}" alt="${champion}"><small>${champion}</small></span>`).join('');
-    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}${captainBadge(player.name)}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${kdaRatio(player).toFixed(2)}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="player-win-rate">${formatWinRate(player)}</td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td class="${peakRank ? 'has-rank' : 'rank-pending'}">${formatRank(peakRank)}</td><td>${player.games}</td><td><div class="player-picks">${pickIcons || 'Pendiente'}</div></td></tr>`;
+    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}${captainBadge(player.name)}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${kdaRatio(player).toFixed(2)}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="player-win-rate">${formatWinRate(player)}</td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td class="${peakRank ? 'has-rank' : 'rank-pending'}">${formatRank(peakRank)}</td><td>${player.games}</td><td>${renderRoleIcons(player)}</td><td><div class="player-picks">${pickIcons || 'Pendiente'}</div></td></tr>`;
   }).join('');
   const sortableHeader = (key, label) => {
     const active = playerSortState.key === key;
@@ -345,7 +372,7 @@ function renderPlayers(list) {
     const indicator = active ? (direction === 'asc' ? '▲' : '▼') : '↕';
     return `<th aria-sort="${active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}"><button type="button" class="table-sort${active ? ' active' : ''}" data-sort="${key}">${label}<span aria-hidden="true">${indicator}</span></button></th>`;
   };
-  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA')}${sortableHeader('winrate', '% Victoria')}${sortableHeader('rank', 'Rango SoloQ')}${sortableHeader('peakRank', 'Peak SoloQ')}${sortableHeader('games', 'PJ')}<th>Picks</th></tr></thead><tbody>${rows}</tbody></table>`;
+  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA')}${sortableHeader('winrate', '% Victoria')}${sortableHeader('rank', 'Rango SoloQ')}${sortableHeader('peakRank', 'Peak SoloQ')}${sortableHeader('games', 'PJ')}<th>Posiciones</th><th>Picks</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 const playerSearch = document.querySelector('#player-search');
