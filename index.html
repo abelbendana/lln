@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Web oficial de La Liga del Norte: equipos, jugadores, calendario, resultados, clasificación y campeones." />
+    <title>La Liga del Norte</title>
+    <link rel="icon" type="image/png" href="assets/wolf.png" />
+    <link rel="shortcut icon" href="assets/wolf.png" />
+    <link rel="apple-touch-icon" href="assets/wolf.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#inicio" aria-label="La Liga del Norte, inicio">
+        <img src="assets/wolf.png" alt="" />
+        <span>LA LIGA<br />DEL NORTE</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="main-nav" class="main-nav" aria-label="Navegación principal">
+        <a class="active" href="#inicio">Inicio</a><a href="#normativa">Normativa</a><a href="#jugadores">Jugadores</a><a href="#equipos">Equipos</a><a href="#calendario">Calendario y partidos</a><a href="#clasificacion">Clasificación</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="inicio" class="hero page-section">
+        <div class="mountains" aria-hidden="true"></div>
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <h1>El muro de los <em>campeones</em></h1>
+            <p>El ganador más reciente de La Liga del Norte. Un nuevo nombre grabado en nuestra historia.</p>
+            <div class="current-title">
+              <span>Temporada 2025</span>
+              <strong>Split de verano</strong>
+            </div>
+            <div class="champion-name"><span aria-hidden="true">◆</span> MAAA NUGUETS</div>
+          </div>
+          <div class="champion-mark reveal">
+            <div class="crest-frame"><img src="assets/maaa-nugueets.png" alt="Escudo de MAAA Nuguets" /></div>
+            <span>Último ganador</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="archive home-archive" aria-labelledby="archive-title">
+        <div class="section-heading"><span></span><h2 id="archive-title">Historial de campeones</h2><span></span></div>
+        <div class="timeline">
+          <article class="winner reveal">
+            <div class="timeline-dot" aria-hidden="true"></div>
+            <img src="assets/maaa-nugueets.png" alt="Escudo de MAAA Nuguets" />
+            <div class="winner-copy"><p>Temporada 2025 · Split de verano</p><h3>MAAA Nuguets</h3></div>
+          </article>
+          <article class="winner reveal">
+            <div class="timeline-dot" aria-hidden="true"></div>
+            <img src="assets/noobs4win.png" alt="Escudo de NOOBS4WIN" />
+            <div class="winner-copy"><p>Temporada 2025 · Split de invierno</p><h3>NOOBS4WIN</h3></div>
+          </article>
+          <article class="winner reveal">
+            <div class="timeline-dot" aria-hidden="true"></div>
+            <img src="assets/monos-coruna.png" alt="Escudo de Monos Coruña" />
+            <div class="winner-copy"><p>Temporada 2024 · Split de verano</p><h3>Monos Coruña</h3></div>
+          </article>
+          <article class="winner reveal">
+            <div class="timeline-dot" aria-hidden="true"></div>
+            <img src="assets/ff15.png" alt="Escudo de FF15" />
+            <div class="winner-copy"><p>Temporada 2024 · Split de invierno</p><h3>FF15</h3></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="normativa" class="content-section page-section">
+        <div class="section-intro reveal"><p class="section-number">01</p><div><h2>Normativa</h2><p>Reglamento oficial de La Liga del Norte.</p></div></div>
+        <div class="rules-toolbar"><span>Temporada 2026/27 · Actualizada el 2 de noviembre de 2026</span><b>4 equipos · Ida y vuelta</b></div>
+        <div class="rule-accordion">
+          <details open><summary>1 · Formato de la competición <span>+</span></summary><div><p>La fase regular está formada por <b>Monos Coruña, Tarnished, Chorbitos y MAAA Nuguets</b>. Se disputa una liga a ida y vuelta: cada equipo juega dos veces contra cada rival, con <b>6 partidos por equipo y 12 encuentros en total</b>.</p><p>Todos los encuentros de fase regular son <b>BO1</b>. Cada jornada dispone de una ventana de 14 días y los partidos pueden adelantarse por acuerdo de ambos equipos informando a administración.</p></div></details>
+          <details><summary>2 · Organización de los partidos <span>+</span></summary><div><p>Los capitanes acuerdan fecha y hora. Uno publica el acuerdo en el canal de partidos del Discord oficial y el otro debe confirmarlo. Desde ese momento pasa a ser la fecha oficial.</p><p>Si no existe una fecha compatible, el partido puede aplazarse sin sanción automática. Administración valorará propuestas, disponibilidad, colaboración y pruebas; podrá conceder victoria administrativa si un equipo impidió manifiestamente la organización.</p></div></details>
+          <details><summary>3 · Puntualidad e incomparecencias <span>+</span></summary><div><p>La hora confirmada en Discord es la oficial y el encuentro comienza con el Draft. Existe un margen de cortesía aproximado de 15 minutos, interpretado con razonabilidad.</p><p>Superado el margen, el equipo preparado puede solicitar victoria por incomparecencia. Si ambos acuerdan esperar, el retraso no podrá utilizarse después como único motivo de reclamación. Se priorizará siempre resolver los partidos jugando.</p></div></details>
+          <details><summary>4 · Plantillas, roles y capitanía <span>+</span></summary><div><p>Cada equipo puede inscribir un máximo de <b>7 jugadores</b> y debe tener capitán oficial. Los jugadores pueden cambiar de posición entre encuentros.</p><p>Como mínimo <b>30 minutos antes</b> se comunicarán los cinco jugadores y sus posiciones. Iniciado el Draft, la alineación del mapa queda cerrada salvo autorización excepcional. Los cambios de capitán deben notificarse.</p></div></details>
+          <details><summary>5 · Fichajes y modificaciones de plantilla <span>+</span></summary><div><p>Las plantillas pueden modificarse libremente hasta el primer partido oficial. Después, el mercado queda cerrado.</p><p>Solo se autorizará una sustitución por baja definitiva justificada; el jugador saliente abandona el roster y nunca podrán superarse siete integrantes. No se puede utilizar esta excepción para reforzar deportivamente el equipo.</p></div></details>
+          <details><summary>6 · Identidad de jugadores y equipos <span>+</span></summary><div><p>Cada participante utilizará la cuenta o Riot ID registrada. Queda prohibido que otra persona juegue con una cuenta inscrita.</p><p>Los equipos conservarán su nombre, escudo e identidad oficial. Cualquier modificación requiere solicitud y autorización previa.</p></div></details>
+          <details><summary>7 · Draft <span>+</span></summary><div><p>Se realizará mediante plataforma externa y será el Draft oficial. La persona responsable facilitará los enlaces a los capitanes y administración podrá seguirlo como Viewer.</p><p>Cada selección o bloqueo dispone de <b>45 segundos</b>. Una elección confirmada es definitiva, salvo fallo técnico verificable, error de configuración de administración o incidencia externa.</p></div></details>
+          <details><summary>8 · Elección de lado <span>+</span></summary><div><p>En fase regular el primer equipo del calendario elige lado. En la vuelta se invierte el orden, garantizando una elección a cada equipo contra el mismo rival. La elección se comunica antes del Draft.</p></div></details>
+          <details><summary>9 · Pausas <span>+</span></summary><div><p>Cada equipo dispone de un máximo acumulado de <b>10 minutos por partida</b> para incidencias reales. El motivo debe comunicarse y el encuentro se reanudará en cuanto quede resuelto.</p><p>Se prohíbe utilizar pausas para obtener ventaja o cortar el ritmo. Superados los diez minutos, los equipos pueden acordar esperar; si no existe acuerdo, decide administración.</p></div></details>
+          <details><summary>10 · Bugs, problemas técnicos y remakes <span>+</span></summary><div><p>El remake es excepcional y puede valorarse ante caídas generales, problemas graves de conexión o fallos que hagan imposible continuar razonablemente. Primero se intentará resolver mediante pausa.</p><p>Un bug menor no basta. Ante un bug grave se debe pausar e informar inmediatamente. Solo administración puede ordenar un remake completo.</p></div></details>
+          <details><summary>11 · Prohibición de surrender <span>+</span></summary><div><p>Está prohibido utilizar Surrender/FF en cualquier encuentro oficial. Las partidas deben finalizar con la destrucción normal del Nexo. Una rendición deliberada puede ser sancionada.</p></div></details>
+          <details><summary>12 · Clasificación y desempates <span>+</span></summary><div><p>La clasificación se decide por puntos: <b>victoria = 3 puntos; derrota = 0 puntos</b>.</p><p>En empate entre dos equipos se usa primero el enfrentamiento directo. Si termina 1-1 y afecta a playoffs, se juega un BO1 de desempate con lado inicial por sorteo. Administración resolverá empates múltiples.</p></div></details>
+          <details><summary>13 · Playoffs <span>+</span></summary><div><p>Con cuatro equipos, acceden los <b>tres primeros</b>. La semifinal enfrenta al 2.º y 3.º en <b>BO5</b>; el ganador juega la Gran Final BO5 contra el 1.º.</p><p>Ambas series usan <b>Fearless Draft Global</b>: cualquier campeón usado queda bloqueado para ambos equipos durante el resto de la serie. Los bloqueos se reinician para la final.</p><p>En el primer mapa elige lado el mejor clasificado; después elige el perdedor del mapa anterior. Se permiten sustituciones entre mapas con jugadores del roster oficial.</p></div></details>
+          <details><summary>14 · Incorporación de nuevos equipos <span>+</span></summary><div><p>Un equipo puede solicitar incorporarse durante la fase regular. Administración valorará calendario, partidos pendientes, disponibilidad e impacto competitivo.</p><p>Si es aceptado, empezará con 0 victorias y 0 derrotas y deberá recuperar sus encuentros. No se admitirán incorporaciones tras la fase regular o el inicio de playoffs.</p></div></details>
+          <details><summary>15 · Posible modificación de playoffs <span>+</span></summary><div><p>El formato actual está diseñado para cuatro equipos. Si aumenta significativamente el número de participantes, administración puede ampliar plazas o eliminatorias preservando proporcionalidad e igualdad. El nuevo formato se anunciará antes de terminar la fase regular.</p></div></details>
+          <details><summary>16 · Abandono o disolución de un equipo <span>+</span></summary><div><p>El abandono debe comunicarse. Si sucede al comienzo, administración puede retirar al equipo y anular resultados; con la temporada avanzada estudiará partidos jugados, pendientes e impacto clasificatorio para adoptar la solución más justa.</p></div></details>
+          <details><summary>17 · Retransmisiones oficiales <span>+</span></summary><div><p>Administración organiza las retransmisiones y autoriza a casters, realizadores y colaboradores. Los equipos permitirán los espectadores oficiales. Ningún colaborador puede transmitir información a los jugadores durante la partida.</p></div></details>
+          <details><summary>18 · Resultados oficiales <span>+</span></summary><div><p>Administración registra y comunica los resultados. Los equipos facilitarán la información solicitada y la clasificación utilizará exclusivamente los resultados oficiales.</p></div></details>
+          <details><summary>19 · Trampas, ayudas externas y juego limpio <span>+</span></summary><div><p>Se prohíben cheats, scripts, stream sniping, suplantación, ayuda externa, asesoramiento en voz, información de espectadores, explotación de bugs y manipulación de resultados.</p><p>Durante Draft y partida solo estarán en el canal de voz los jugadores de ese mapa. Las trampas deliberadas son infracción especialmente grave y las sanciones podrán extenderse a quienes conocieran o apoyaran la conducta.</p></div></details>
+          <details><summary>20 · Conducta y deportividad <span>+</span></summary><div><p>Se exige respeto hacia jugadores, equipos, administración y retransmisión. Pueden sancionarse insultos graves, amenazas, acoso, discriminación, hostigamiento y comportamiento antideportivo.</p><p>Se valoran contexto, intención, relación, gravedad, reiteración y reacción. Una broma no justifica continuar cuando alguien ha manifestado que le resulta ofensiva.</p></div></details>
+          <details><summary>21 · Sanciones <span>+</span></summary><div><p>Según gravedad, intención, consecuencias y reincidencia, las medidas pueden ser aviso, suspensión, pérdida administrativa de partidos o puntos y expulsión de un jugador o equipo.</p><p>No es obligatorio aplicar sanciones progresivamente: una infracción grave puede recibir directamente una sanción elevada.</p></div></details>
+          <details><summary>22 · Reclamaciones <span>+</span></summary><div><p>Las realiza preferentemente el capitán, en privado, dentro de las <b>24 horas</b> posteriores. Deben explicar los hechos e incluir pruebas cuando sea posible.</p><p>Fuera de plazo, administración no está obligada a admitirlas, aunque puede hacerlo excepcionalmente o investigar de oficio hechos graves contra la integridad competitiva.</p></div></details>
+          <details><summary>23 · Casos no contemplados <span>+</span></summary><div><p>Administración resolverá situaciones no previstas aplicando buena fe, proporcionalidad, igualdad e integridad competitiva. Podrá solicitar pruebas y sus decisiones serán vinculantes.</p></div></details>
+          <details><summary>24 · Modificaciones de la normativa <span>+</span></summary><div><p>Administración puede modificar o aclarar las reglas durante la temporada. Los cambios relevantes se comunicarán públicamente y, como norma general, no tendrán efectos retroactivos.</p></div></details>
+          <details><summary>25 · Comunicaciones oficiales <span>+</span></summary><div><p>El Discord oficial es el principal medio de comunicación. Los capitanes deben mantenerse informados y trasladar las comunicaciones relevantes a sus jugadores.</p></div></details>
+          <details><summary>26 · Aceptación de la normativa <span>+</span></summary><div><p>Participar en la Liga del Norte 2026/27 implica aceptar íntegramente estas reglas. El desconocimiento no exime de su cumplimiento y continuar tras una modificación comunicada supone aceptarla.</p></div></details>
+        </div>
+        <blockquote class="general-principle"><b>Principio general de la Liga del Norte</b><p>La normativa se aplica con sentido común, proporcionalidad y buena fe. Siempre que exista una solución justa, se priorizará resolver la competición jugando dentro de la Grieta antes que mediante tecnicismos o victorias administrativas.</p><p>La finalidad de estas normas es proteger la competición, no buscar maneras de ganar fuera de ella.</p></blockquote>
+      </section>
+
+      <section id="jugadores" class="content-section section-dark page-section">
+        <div class="section-intro reveal"><p class="section-number">02</p><div><h2>Jugadores</h2><p>Participantes confirmados por alineaciones, con KDA medio, picks y acceso a OP.GG.</p></div></div>
+        <label class="search-box"><span>⌕</span><input id="player-search" type="search" placeholder="Buscar jugador, equipo o pick…" /></label>
+        <div id="players-grid" class="players-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="equipos" class="content-section page-section">
+        <div class="section-intro reveal"><p class="section-number">03</p><div><h2>Equipos</h2><p>Los clubes que compiten por conquistar el norte.</p></div></div>
+        <div class="team-grid" id="teams-grid">
+          <button class="team-panel" data-team="Tarnished"><img src="assets/tarnished.png" alt="Tarnished" /><h3>Tarnished</h3></button>
+          <button class="team-panel" data-team="Monos Coruña"><img src="assets/monos-coruna.png" alt="Monos Coruña" /><h3>Monos Coruña</h3></button>
+          <button class="team-panel" data-team="Maaa Nugueets"><img src="assets/maaa-nugueets.png" alt="Maaa Nugueets" /><h3>Maaa Nugueets</h3></button>
+          <button class="team-panel" data-team="Chorbitos"><img src="assets/chorbitos.png" alt="Chorbitos" /><h3>Chorbitos</h3></button>
+        </div>
+        <dialog id="team-dialog"><button class="dialog-close" aria-label="Cerrar">×</button><img src="" alt="" /><div><p>Equipo participante</p><h3></h3><span>Split de verano · Temporada regular</span><div class="team-roster"></div></div></dialog>
+      </section>
+
+      <section id="calendario" class="content-section section-dark page-section">
+        <div class="section-intro reveal"><p class="section-number">04</p><div><h2>Calendario y partidos</h2><p>Temporada 2026/27 · Fechas, resultados, alineaciones, KDA y retransmisiones.</p></div></div>
+        <div id="matches-grid" class="matches-grid"></div>
+      </section>
+
+      <section id="clasificacion" class="content-section section-dark page-section">
+        <div class="section-intro reveal"><p class="section-number">05</p><div><h2>Clasificación</h2><p>Temporada 2026/27 · Tras cuatro jornadas.</p></div></div>
+        <div class="standings reveal" role="table" aria-label="Clasificación de equipos">
+          <div class="standing-head" role="row"><span>Pos.</span><span>Equipo</span><span>PJ</span><span>V</span><span>D</span><span>Pts.</span></div>
+          <div role="row"><b>1</b><span><img src="assets/maaa-nugueets.png" alt="" />Maaa Nuguets</span><span>4</span><span>3</span><span>1</span><strong>9</strong></div>
+          <div role="row"><b>2</b><span><img src="assets/chorbitos.png" alt="" />Chorbitos</span><span>4</span><span>2</span><span>2</span><strong>6</strong></div>
+          <div role="row"><b>3</b><span><img src="assets/monos-coruna.png" alt="" />Monos Coruña</span><span>4</span><span>2</span><span>2</span><strong>6</strong></div>
+          <div role="row"><b>4</b><span><img src="assets/tarnished.png" alt="" />Tarnished</span><span>4</span><span>1</span><span>3</span><strong>3</strong></div>
+        </div>
+        <div class="points-legend"><b>Puntuaciones</b><span>Victoria · 3 puntos</span><span>Derrota · 0 puntos</span><span>Desempate · enfrentamiento directo / BO1 si afecta a playoffs</span></div>
+        <h3 class="playoff-title">Playoffs</h3>
+        <div class="bracket"><div><p>Semifinal · Si terminase hoy</p><span><img src="assets/chorbitos.png" alt="" />2.º Chorbitos</span><span><img src="assets/monos-coruna.png" alt="" />3.º Monos Coruña</span></div><i>→</i><div><p>Gran Final</p><span><img src="assets/maaa-nugueets.png" alt="" />1.º MAAA Nuguets</span><span><img src="assets/wolf.png" alt="" />Ganador semifinal</span></div></div>
+      </section>
+
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="#inicio"><img src="assets/wolf.png" alt="" /><span>LA LIGA<br />DEL NORTE</span></a>
+      <div class="socials" aria-label="Redes sociales">
+        <a href="https://www.twitch.tv/roiceteee" target="_blank" rel="noreferrer" aria-label="Twitch de Roiceteee">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M2.6 1 1 5.3v15.1h5.5V23l3-2.6h4.1L21 13V1H2.6Zm16.1 11-3.3 3.3h-4.3l-2.8 2.4v-2.4H4.7V3.4h14V12Zm-3.4-6.1h-2.4v6.6h2.4V5.9Zm-4.5 0H8.4v6.6h2.4V5.9Z"/>
+          </svg>
+        </a>
+      </div>
+      <p>© 2026 La Liga del Norte</p>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
