@@ -1,5 +1,17 @@
 document.documentElement.classList.add('js');
 
+const mainContent = document.querySelector('main');
+const pageOrder = [
+  document.querySelector('#inicio'),
+  document.querySelector('.home-archive'),
+  document.querySelector('#clasificacion'),
+  document.querySelector('#calendario'),
+  document.querySelector('#equipos'),
+  document.querySelector('#jugadores'),
+  document.querySelector('#normativa')
+];
+pageOrder.forEach((section) => mainContent.append(section));
+
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.main-nav');
 
@@ -60,33 +72,33 @@ const games = [
   {date:'1–14 septiembre',a:'Monos Coruña',b:'Maaa Nugueets',winner:'Maaa Nugueets',week:'Jornada 1',duration:'33:18',twitch:'https://www.twitch.tv/videos/2874299653',lineups:{
     'Monos Coruña':[
       {name:'Conde Nesquick',champion:'Malphite',kda:'2/5/4'},
-      {name:'General Panza',champion:'Vi',kda:'7/4/4'},
+      {name:'General Panza',champion:'Wukong',kda:'7/4/4'},
       {name:'DrRedFlag',champion:'Vex',kda:'2/4/5'},
-      {name:'Tugoldobello',champion:'Kai’Sa',kda:'1/4/0'},
-      {name:'MNC Roicetee',champion:'Zoe',kda:'0/5/2'}
+      {name:'Tugoldobello',champion:'Xayah',kda:'1/4/0'},
+      {name:'MNC Roicetee',champion:'Rakan',kda:'0/5/2'}
     ],
     'Maaa Nugueets':[
       {name:'eiboll',champion:'Garen',kda:'8/3/9'},
       {name:'jadriab10',champion:'Lee Sin',kda:'1/4/6'},
-      {name:'Keiwocky',champion:'Jayce',kda:'4/4/4'},
+      {name:'MKOI Keiwocky',champion:'Pantheon',kda:'4/4/4'},
       {name:'JONI',champion:'Caitlyn',kda:'4/0/11'},
       {name:'puminy',champion:'Lux',kda:'5/1/7'}
     ]
   }},
   {date:'1–14 septiembre',a:'Tarnished',b:'Chorbitos',winner:'Chorbitos',week:'Jornada 1',duration:'39:20',twitch:'https://www.twitch.tv/videos/2863148202',lineups:{
     'Tarnished':[
-      {name:'TR Markos316',champion:'Twitch',kda:'14/10/2'},
-      {name:'TR Arkinos',champion:'Viego',kda:'7/8/10'},
-      {name:'TR Adria Kila',champion:'Katarina',kda:'5/11/10'},
+      {name:'TR Markos316',champion:'Teemo',kda:'14/10/2'},
+      {name:'TR Arkinos',champion:'Sylas',kda:'7/8/10'},
+      {name:'TR Adria Kila',champion:'Aatrox',kda:'5/11/10'},
       {name:'TR alex132mini',champion:'Caitlyn',kda:'4/10/5'},
-      {name:'TR Terminator',champion:'Nautilus',kda:'0/7/10'}
+      {name:'TR Terminator',champion:'Alistar',kda:'0/7/10'}
     ],
     'Chorbitos':[
-      {name:'Panker',champion:'Ambessa',kda:'11/10/7'},
-      {name:'Romera',champion:'Hecarim',kda:'11/3/13'},
-      {name:'Nómada',champion:'Kai’Sa',kda:'15/4/8'},
-      {name:'SobrinoRelax',champion:'Jhin',kda:'8/6/17'},
-      {name:'Afelaino',champion:'Zoe',kda:'1/7/23'}
+      {name:'Panker',champion:'Cassiopeia',kda:'11/10/7'},
+      {name:'Romera',champion:'Talon',kda:'11/3/13'},
+      {name:'Nómada',champion:'Ahri',kda:'15/4/8'},
+      {name:'SobrinoRelax',champion:'Jinx',kda:'8/6/17'},
+      {name:'Afelaino',champion:'Yuumi',kda:'1/7/23'}
     ]
   }},
   {date:'15–28 septiembre',a:'Chorbitos',b:'Maaa Nugueets',winner:'Chorbitos',week:'Jornada 2',duration:'29:56',twitch:'https://www.twitch.tv/videos/2888366698',lineups:{
@@ -95,30 +107,30 @@ const games = [
       {name:'Romera',champion:'Olaf',kda:'5/4/8'},
       {name:'Nómada',champion:'Syndra',kda:'2/4/7'},
       {name:'SobrinoRelax',champion:'Tristana',kda:'5/2/1'},
-      {name:'Bochi',champion:'Seraphine',kda:'1/3/10'}
+      {name:'Bochi',champion:'Sona',kda:'1/3/10'}
     ],
     'Maaa Nugueets':[
-      {name:'JONI',champion:'Sion',kda:'1/6/3'},
-      {name:'Keiwocky',champion:'Shyvana',kda:'8/6/1'},
-      {name:'eiboll',champion:'Fizz',kda:'1/3/10'},
-      {name:'jadriab10',champion:'Kai’Sa',kda:'2/4/6'},
+      {name:'JONI',champion:'Aatrox',kda:'1/6/3'},
+      {name:'MKOI Keiwocky',champion:'Shyvana',kda:'8/6/1'},
+      {name:'eiboll',champion:'Zilean',kda:'1/3/10'},
+      {name:'jadriab10',champion:'Yunara',kda:'2/4/6'},
       {name:'puminy',champion:'Amumu',kda:'2/3/8'}
     ]
   }},
   {date:'15–28 septiembre',a:'Monos Coruña',b:'Tarnished',winner:'Monos Coruña',week:'Jornada 2',duration:'28:19',twitch:'https://www.twitch.tv/videos/2886607109',lineups:{
     'Monos Coruña':[
-      {name:'CANICHEMANIA63',champion:'Kindred',kda:'7/4/2'},
-      {name:'General Panza',champion:'Qiyana',kda:'10/3/10'},
-      {name:'Tugoldobello',champion:'Vladimir',kda:'5/3/7'},
-      {name:'DrRedFlag',champion:'Syndra',kda:'9/2/9'},
-      {name:'Iontxas',champion:'Tahm Kench',kda:'1/2/19'}
+      {name:'CANICHEMANIA63',champion:'Volibear',kda:'7/4/2'},
+      {name:'General Panza',champion:'Lillia',kda:'10/3/10'},
+      {name:'Tugoldobello',champion:'Naafiri',kda:'5/3/7'},
+      {name:'DrRedFlag',champion:'Yunara',kda:'9/2/9'},
+      {name:'Iontxas',champion:'Braum',kda:'1/2/19'}
     ],
     'Tarnished':[
-      {name:'TR Markos316',champion:'Sion',kda:'3/7/5'},
-      {name:'TR Arkinos',champion:'Brand',kda:'9/6/5'},
-      {name:'TR Adria Kila',champion:'LeBlanc',kda:'2/6/8'},
-      {name:'TR alex132mini',champion:'Azir',kda:'0/5/3'},
-      {name:'TR Terminator',champion:'Anivia',kda:'0/8/5'}
+      {name:'TR Markos316',champion:'Darius',kda:'3/7/5'},
+      {name:'TR Arkinos',champion:'Vi',kda:'9/6/5'},
+      {name:'TR Adria Kila',champion:'Galio',kda:'2/6/8'},
+      {name:'TR alex132mini',champion:'Kai’Sa',kda:'0/5/3'},
+      {name:'TR Terminator',champion:'Nautilus',kda:'0/8/5'}
     ]
   }},
   {date:'29 septiembre–12 octubre',a:'Monos Coruña',b:'Chorbitos',winner:'Monos Coruña',week:'Jornada 3',duration:'31:50',twitch:'https://www.twitch.tv/videos/2892876516',lineups:{
@@ -127,36 +139,36 @@ const games = [
       {name:'General Panza',champion:'Wukong',kda:'6/2/8'},
       {name:'Tugoldobello',champion:'Galio',kda:'1/4/12'},
       {name:'DrRedFlag',champion:'Tristana',kda:'6/2/9'},
-      {name:'MNC Roicetee',champion:'Bard',kda:'3/2/14'}
+      {name:'MNC Roicetee',champion:'Nautilus',kda:'3/2/14'}
     ],
     'Chorbitos':[
       {name:'Panker',champion:'Gwen',kda:'2/4/3'},
-      {name:'ZaRg0t',champion:'Kayn',kda:'6/2/3'},
-      {name:'Nómada',champion:'Syndra',kda:'3/4/4'},
-      {name:'SobrinoRelax',champion:'Smolder',kda:'1/7/4'},
+      {name:'ZaRg0t',champion:'Talon',kda:'6/2/3'},
+      {name:'Nómada',champion:'Diana',kda:'3/4/4'},
+      {name:'SobrinoRelax',champion:'Kai’Sa',kda:'1/7/4'},
       {name:'Afelaino',champion:'Yuumi',kda:'1/5/4'}
     ]
   }},
   {date:'29 septiembre–12 octubre',a:'Maaa Nugueets',b:'Tarnished',winner:'Maaa Nugueets',week:'Jornada 3',duration:'26:23',twitch:'https://www.twitch.tv/videos/2900841639',lineups:{
     'Maaa Nugueets':[
-      {name:'Keiwocky',champion:'Shyvana',kda:'6/6/9'},
+      {name:'MKOI Keiwocky',champion:'Yone',kda:'6/6/9'},
       {name:'eiboll',champion:'Jarvan IV',kda:'11/1/18'},
       {name:'jadriab10',champion:'Ekko',kda:'8/3/11'},
-      {name:'JONI',champion:'Heimerdinger',kda:'11/3/7'},
+      {name:'JONI',champion:'Ziggs',kda:'11/3/7'},
       {name:'puminy',champion:'Shaco',kda:'5/2/13'}
     ],
     'Tarnished':[
-      {name:'TR alex132mini',champion:'Bel’Veth',kda:'5/7/4'},
+      {name:'TR alex132mini',champion:'Mordekaiser',kda:'5/7/4'},
       {name:'TR Arkinos',champion:'Viego',kda:'0/10/2'},
       {name:'TRPescadocanario',champion:'Katarina',kda:'6/8/1'},
-      {name:'TR Markos316',champion:'Twitch',kda:'0/7/4'},
-      {name:'TR Adria Kila',champion:'Rumble',kda:'4/9/1'}
+      {name:'TR Markos316',champion:'Swain',kda:'0/7/4'},
+      {name:'TR Adria Kila',champion:'Pantheon',kda:'4/9/1'}
     ]
   }},
   {date:'13–26 octubre',a:'Monos Coruña',b:'Maaa Nugueets',winner:'Maaa Nugueets',week:'Jornada 4'},
   {date:'13–26 octubre',a:'Tarnished',b:'Chorbitos',winner:'Tarnished',week:'Jornada 4',duration:'26:20',twitch:'https://www.twitch.tv/videos/2911664510',lineups:{
     'Tarnished':[
-      {name:'TR alex132mini',champion:'Cho’Gath',kda:'9/2/7'},
+      {name:'TR alex132mini',champion:'Renekton',kda:'9/2/7'},
       {name:'TR Arkinos',champion:'Amumu',kda:'9/1/7'},
       {name:'TRPescadocanario',champion:'Katarina',kda:'15/2/5'},
       {name:'TR Markos316',champion:'Twitch',kda:'10/3/14'},
@@ -165,9 +177,9 @@ const games = [
     'Chorbitos':[
       {name:'Panker',champion:'Ambessa',kda:'1/7/2'},
       {name:'Romera',champion:'Hecarim',kda:'3/9/2'},
-      {name:'Nómada',champion:'Kai’Sa',kda:'3/4/1'},
-      {name:'SobrinoRelax',champion:'Jhin',kda:'3/13/2'},
-      {name:'Afelaino',champion:'Zoe',kda:'1/11/4'}
+      {name:'Nómada',champion:'Syndra',kda:'3/4/1'},
+      {name:'SobrinoRelax',champion:'Miss Fortune',kda:'3/13/2'},
+      {name:'Afelaino',champion:'Lux',kda:'1/11/4'}
     ]
   }},
   {date:'27 octubre–9 noviembre',a:'Tarnished',b:'Monos Coruña',winner:null,week:'Jornada 5 · Pendiente'},
@@ -182,9 +194,10 @@ games.forEach((game) => {
     const members = teamMembers.get(team) || new Set();
     lineup.forEach((player) => {
       members.add(player.name);
-      const stats = playerStats.get(player.name) || {name:player.name,team,games:0,kills:0,deaths:0,assists:0,picks:new Set()};
+      const stats = playerStats.get(player.name) || {name:player.name,team,games:0,wins:0,kills:0,deaths:0,assists:0,picks:new Set()};
       const [kills, deaths, assists] = player.kda.split('/').map(Number);
       stats.games += 1;
+      if (game.winner === team) stats.wins += 1;
       stats.kills += kills;
       stats.deaths += deaths;
       stats.assists += assists;
@@ -193,6 +206,17 @@ games.forEach((game) => {
     });
     teamMembers.set(team, members);
   });
+});
+const registeredPlayers = [
+  {name:'sam',team:'Maaa Nugueets'}
+];
+registeredPlayers.forEach((player) => {
+  const members = teamMembers.get(player.team) || new Set();
+  members.add(player.name);
+  teamMembers.set(player.team, members);
+  if (!playerStats.has(player.name)) {
+    playerStats.set(player.name, {name:player.name,team:player.team,games:0,wins:0,kills:0,deaths:0,assists:0,picks:new Set()});
+  }
 });
 teamMembers.forEach((members, team) => teamMembers.set(team, [...members].sort((a, b) => a.localeCompare(b, 'es'))));
 
@@ -204,13 +228,13 @@ const riotProfiles = {
   puminy:{tag:'EUW',status:'inferred'}, 'MNC Roicetee':{tag:'014',status:'inferred'},
   Iontxas:{tag:'MNC',status:'inferred'}, Tugoldobello:{tag:'YOKO',status:'inferred'},
   'TR Adria Kila':{tag:'DKS',status:'inferred'}, 'TR Markos316':{tag:'GGWP',status:'inferred'},
-  Keiwocky:{tag:'GAP',status:'inferred'}, 'General Panza':{tag:'NGL',status:'found'},
+  'MKOI Keiwocky':{tag:'GAP',status:'known'}, 'General Panza':{tag:'NGL',status:'found'},
   'TR Arkinos':{tag:'777',status:'found'}, 'TR Terminator':{tag:'1998',status:'found'},
   Bolrich:{tag:'EUW',status:'found'}, Romera:{tag:'888',status:'found'},
   'Nómada':{tag:'00000',status:'found'}, SobrinoRelax:{tag:'EUW',status:'found'},
   ZaRg0t:{tag:'17495',status:'found'}, 'Conde Nesquick':{tag:'NGL',status:'found'},
   JONI:{gameName:'J0NI',tag:'SAD',status:'known'},
-  TRPescadocanario:{tag:'316',status:'known'}
+  TRPescadocanario:{tag:'316',status:'known'}, sam:{tag:'scp',status:'known'}
 };
 const soloQueueRanks = {
   eiboll:{tier:'Diamante',division:4,lp:97}, DrRedFlag:{tier:'Esmeralda',division:3,lp:59},
@@ -220,10 +244,12 @@ const soloQueueRanks = {
   puminy:{tier:'Diamante',division:4,lp:0}, 'MNC Roicetee':{tier:'Oro',division:4,lp:19},
   Iontxas:{tier:'Plata',division:2,lp:99}, Tugoldobello:{tier:'Plata',division:3,lp:77},
   'TR Adria Kila':{tier:'Platino',division:4,lp:0}, 'TR Markos316':{tier:'Oro',division:3,lp:74},
+  'MKOI Keiwocky':{tier:'Oro',division:2,lp:4},
   'General Panza':{tier:'Esmeralda',division:4,lp:85}, 'TR Arkinos':{tier:'Esmeralda',division:4,lp:0},
   'TR Terminator':{tier:'Plata',division:3,lp:86}, Bolrich:{tier:'Diamante',division:3,lp:41},
   Romera:{tier:'Diamante',division:2,lp:29}, 'Nómada':{tier:'Esmeralda',division:4,lp:28},
-  SobrinoRelax:{tier:'Plata',division:4,lp:32}, ZaRg0t:{tier:'Platino',division:2,lp:44}
+  SobrinoRelax:{tier:'Plata',division:4,lp:32}, ZaRg0t:{tier:'Platino',division:2,lp:44},
+  sam:{tier:'Esmeralda',division:3,lp:89}
 };
 const rankTiers = ['Hierro','Bronce','Plata','Oro','Platino','Esmeralda','Diamante','Maestro','Gran Maestro','Challenger'];
 const romanDivision = (division) => ['','I','II','III','IV'][division] || '';
@@ -238,25 +264,38 @@ function formatAverageRank(score) {
   return `${rankTiers[tierIndex]} ${romanDivision(4 - divisionStep)}`;
 }
 
-function renderTeamRoster(members) {
-  if (!members.length) return '<p>Plantilla pendiente de identificar</p>';
+function getTeamRankSummary(members) {
   const rankedMembers = members
     .map((name) => ({name, rank:soloQueueRanks[name]}))
     .filter((player) => player.rank)
     .sort((a, b) => rankScore(b.rank) - rankScore(a.rank));
   const bestFive = rankedMembers.slice(0, 5);
   const averageScore = bestFive.length ? bestFive.reduce((total, player) => total + rankScore(player.rank), 0) / bestFive.length : null;
+  return {bestFive, averageScore};
+}
+
+function renderTeamRoster(members) {
+  if (!members.length) return '<p>Plantilla pendiente de identificar</p>';
+  const {averageScore} = getTeamRankSummary(members);
   const rows = members.map((name) => {
     const rank = soloQueueRanks[name];
     const player = playerStats.get(name) || {name};
     return `<tr><td><a href="${opggUrl(player)}" target="_blank" rel="noopener">${name}<span>OP.GG ↗</span></a></td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td></tr>`;
   }).join('');
-  const countLabel = `${bestFive.length} ${bestFive.length === 1 ? 'jugador' : 'jugadores'}`;
-  return `<div class="team-rank-summary"><span>Rango promedio · mejores 5</span><strong>${averageScore === null ? 'Pendiente' : formatAverageRank(averageScore)}</strong><small>Calculado con ${countLabel} con rango confirmado</small></div><div class="team-table-wrap"><table><thead><tr><th>Jugador</th><th>Rango SoloQ</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="team-rank-summary"><span>Rango promedio · mejores 5</span><strong>${averageScore === null ? 'Pendiente' : formatAverageRank(averageScore)}</strong></div><div class="team-table-wrap"><table><thead><tr><th>Jugador</th><th>Rango SoloQ</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
+
+document.querySelectorAll('.team-panel').forEach((card) => {
+  const members = teamMembers.get(card.dataset.team) || [];
+  const {averageScore} = getTeamRankSummary(members);
+  const rank = averageScore === null ? 'Pendiente' : formatAverageRank(averageScore);
+  card.insertAdjacentHTML('beforeend', `<div class="team-panel-rank"><span>Rango promedio · mejores 5</span><strong>${rank}</strong></div>`);
+});
 const leaguePlayers = [...playerStats.values()].sort((a, b) => a.team.localeCompare(b.team, 'es') || a.name.localeCompare(b.name, 'es'));
-const average = (total, gamesPlayed) => (total / gamesPlayed).toFixed(1);
+const average = (total, gamesPlayed) => gamesPlayed ? (total / gamesPlayed).toFixed(1) : '0.0';
 const kdaRatio = (player) => (player.kills + player.assists) / Math.max(player.deaths, 1);
+const winRate = (player) => player.games ? (player.wins / player.games) * 100 : null;
+const formatWinRate = (player) => winRate(player) === null ? '—' : `${Math.round(winRate(player))}%`;
 const championSlug = (champion) => ({'Kai’Sa':'Kaisa','Bel’Veth':'Belveth','Cho’Gath':'Chogath','Dr. Mundo':'DrMundo','Jarvan IV':'JarvanIV','Lee Sin':'LeeSin','Tahm Kench':'TahmKench',Wukong:'MonkeyKing',LeBlanc:'Leblanc'}[champion] || champion.replace(/[^A-Za-z0-9]/g, ''));
 const championIcon = (champion) => `https://ddragon.leagueoflegends.com/cdn/16.21.1/img/champion/${championSlug(champion)}.png`;
 const opggUrl = (player) => {
@@ -279,26 +318,54 @@ function renderPlayers(list) {
     const picks = [...player.picks];
     const rank = soloQueueRanks[player.name];
     const pickIcons = picks.map((champion) => `<span class="pick-icon" title="${champion}"><img src="${championIcon(champion)}" alt="${champion}"><small>${champion}</small></span>`).join('');
-    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${kdaRatio(player).toFixed(2)}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td>${player.games}</td><td><div class="player-picks">${pickIcons || 'Pendiente'}</div></td></tr>`;
+    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${kdaRatio(player).toFixed(2)}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="player-win-rate">${formatWinRate(player)}</td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td>${player.games}</td><td><div class="player-picks">${pickIcons || 'Pendiente'}</div></td></tr>`;
   }).join('');
-  playersGrid.innerHTML = `<table class="players-table"><thead><tr><th>Equipo</th><th>Jugador</th><th>KDA</th><th>Rango SoloQ</th><th>PJ</th><th>Picks</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const sortableHeader = (key, label) => {
+    const active = playerSortState.key === key;
+    const direction = active ? playerSortState.direction : 'none';
+    const indicator = active ? (direction === 'asc' ? '▲' : '▼') : '↕';
+    return `<th aria-sort="${active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}"><button type="button" class="table-sort${active ? ' active' : ''}" data-sort="${key}">${label}<span aria-hidden="true">${indicator}</span></button></th>`;
+  };
+  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA')}${sortableHeader('winrate', '% Victoria')}${sortableHeader('rank', 'Rango SoloQ')}${sortableHeader('games', 'PJ')}<th>Picks</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 const playerSearch = document.querySelector('#player-search');
 const playerSort = document.querySelector('#player-sort');
+const playerSortState = {key:'kda',direction:'desc'};
+const defaultSortDirection = (key) => ['team', 'name'].includes(key) ? 'asc' : 'desc';
 function updatePlayers() {
   const query = playerSearch.value.trim().toLocaleLowerCase('es');
   const filtered = leaguePlayers.filter((player) => [player.name, player.team, ...player.picks].join(' ').toLocaleLowerCase('es').includes(query));
   filtered.sort((a, b) => {
-    if (playerSort.value === 'kda') return kdaRatio(b) - kdaRatio(a) || a.name.localeCompare(b.name, 'es');
-    if (playerSort.value === 'rank') return (soloQueueRanks[b.name] ? rankScore(soloQueueRanks[b.name]) : -1) - (soloQueueRanks[a.name] ? rankScore(soloQueueRanks[a.name]) : -1) || a.name.localeCompare(b.name, 'es');
-    return a.team.localeCompare(b.team, 'es') || a.name.localeCompare(b.name, 'es');
+    const values = {
+      team:[a.team, b.team], name:[a.name, b.name], kda:[kdaRatio(a), kdaRatio(b)],
+      winrate:[winRate(a) ?? -1, winRate(b) ?? -1],
+      rank:[soloQueueRanks[a.name] ? rankScore(soloQueueRanks[a.name]) : -1, soloQueueRanks[b.name] ? rankScore(soloQueueRanks[b.name]) : -1],
+      games:[a.games, b.games]
+    }[playerSortState.key];
+    const comparison = typeof values[0] === 'string' ? values[0].localeCompare(values[1], 'es') : values[0] - values[1];
+    return (playerSortState.direction === 'asc' ? comparison : -comparison) || a.name.localeCompare(b.name, 'es');
   });
   renderPlayers(filtered);
 }
 updatePlayers();
 playerSearch.addEventListener('input', updatePlayers);
-playerSort.addEventListener('change', updatePlayers);
+playerSort.addEventListener('change', () => {
+  playerSortState.key = playerSort.value;
+  playerSortState.direction = defaultSortDirection(playerSort.value);
+  updatePlayers();
+});
+playersGrid.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-sort]');
+  if (!button) return;
+  const key = button.dataset.sort;
+  playerSortState.direction = playerSortState.key === key
+    ? (playerSortState.direction === 'asc' ? 'desc' : 'asc')
+    : defaultSortDirection(key);
+  playerSortState.key = key;
+  playerSort.value = key;
+  updatePlayers();
+});
 
 function renderLineup(game, team) {
   const lineup = game.lineups?.[team];
@@ -324,7 +391,12 @@ function renderTwitchLink(game) {
   return '';
 }
 
-document.querySelector('#matches-grid').innerHTML = games.map((game) => `<article class="flip-card${game.lineups ? ' has-details' : ''}" tabindex="0"><div class="flip-card-inner"><div class="flip-face"><p>${game.week}</p><div class="flip-teams"><span><img src="${logo(game.a)}" alt="">${game.a}</span><b>VS</b><span><img src="${logo(game.b)}" alt="">${game.b}</span></div><div class="match-card-footer"><span>${game.lineups ? 'Ver alineaciones y KDA' : game.date}</span>${renderTwitchLink(game)}</div></div><div class="flip-face flip-back"><p>${game.winner ? `Victoria · ${game.winner}` : 'Partido pendiente'}</p>${renderMatchStats(game)}${game.lineups ? `<div class="match-lineups">${renderLineup(game, game.a)}${renderLineup(game, game.b)}</div>` : game.winner ? `<img src="${logo(game.winner)}" alt=""><h3>${game.winner}</h3>` : '<h3>Por disputar</h3>'}<div class="match-card-footer">${renderTwitchLink(game)}</div></div></div></article>`).join('');
+function renderMatchTeam(game, team) {
+  const resultClass = game.winner === team ? ' is-winner' : game.winner ? ' is-loser' : '';
+  return `<span class="match-team${resultClass}"><img src="${logo(team)}" alt=""><strong>${team}</strong></span>`;
+}
+
+document.querySelector('#matches-grid').innerHTML = games.map((game) => `<article class="flip-card${game.lineups ? ' has-details' : ''}${game.winner ? ' is-complete' : ''}" tabindex="0"><div class="flip-card-inner"><div class="flip-face"><p>${game.week}</p><div class="flip-teams">${renderMatchTeam(game, game.a)}<b>VS</b>${renderMatchTeam(game, game.b)}</div><div class="match-card-footer"><span>${game.lineups ? 'Ver alineaciones y KDA' : game.date}</span>${renderTwitchLink(game)}</div></div><div class="flip-face flip-back"><p class="match-result${game.winner ? ' is-winner' : ''}">${game.winner ? `✓ Victoria · ${game.winner}` : 'Partido pendiente'}</p>${renderMatchStats(game)}${game.lineups ? `<div class="match-lineups">${renderLineup(game, game.a)}${renderLineup(game, game.b)}</div>` : game.winner ? `<img src="${logo(game.winner)}" alt=""><h3>${game.winner}</h3>` : '<h3>Por disputar</h3>'}<div class="match-card-footer">${renderTwitchLink(game)}</div></div></div></article>`).join('');
 document.querySelector('#matches-grid').addEventListener('click', (event) => {
   if (event.target.closest('a')) return;
   event.target.closest('.flip-card')?.classList.toggle('flipped');
