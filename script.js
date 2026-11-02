@@ -256,6 +256,9 @@ function renderTeamRoster(members) {
 }
 const leaguePlayers = [...playerStats.values()].sort((a, b) => a.team.localeCompare(b.team, 'es') || a.name.localeCompare(b.name, 'es'));
 const average = (total, gamesPlayed) => (total / gamesPlayed).toFixed(1);
+const kdaRatio = (player) => (player.kills + player.assists) / Math.max(player.deaths, 1);
+const championSlug = (champion) => ({'Kai’Sa':'Kaisa','Bel’Veth':'Belveth','Cho’Gath':'Chogath','Dr. Mundo':'DrMundo','Jarvan IV':'JarvanIV','Lee Sin':'LeeSin','Tahm Kench':'TahmKench',Wukong:'MonkeyKing',LeBlanc:'Leblanc'}[champion] || champion.replace(/[^A-Za-z0-9]/g, ''));
+const championIcon = (champion) => `https://ddragon.leagueoflegends.com/cdn/16.21.1/img/champion/${championSlug(champion)}.png`;
 const opggUrl = (player) => {
   const profile = riotProfiles[player.name];
   const gameName = profile?.gameName || player.name;
@@ -268,17 +271,34 @@ const riotIdLabel = (player) => {
 };
 
 function renderPlayers(list) {
-  playersGrid.innerHTML = list.length ? list.map((player) => {
+  if (!list.length) {
+    playersGrid.innerHTML = '<p>No se encontraron jugadores.</p>';
+    return;
+  }
+  const rows = list.map((player) => {
     const picks = [...player.picks];
-    return `<a class="player-card" href="${opggUrl(player)}" target="_blank" rel="noopener"><div class="player-card-heading"><div><h3>${player.name}</h3>${riotIdLabel(player)}</div><span>${player.games} ${player.games === 1 ? 'partido' : 'partidos'}</span></div><div class="player-meta"><span>${player.team}</span><b>OP.GG ↗</b></div><dl class="player-stats"><div><dt>KDA medio</dt><dd>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</dd></div><div><dt>Picks</dt><dd>${picks.length ? picks.join(', ') : 'Pendientes de confirmar'}</dd></div></dl></a>`;
-  }).join('') : '<p>No se encontraron jugadores.</p>';
+    const rank = soloQueueRanks[player.name];
+    const pickIcons = picks.map((champion) => `<span class="pick-icon" title="${champion}"><img src="${championIcon(champion)}" alt="${champion}"><small>${champion}</small></span>`).join('');
+    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${kdaRatio(player).toFixed(2)}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td>${player.games}</td><td><div class="player-picks">${pickIcons || 'Pendiente'}</div></td></tr>`;
+  }).join('');
+  playersGrid.innerHTML = `<table class="players-table"><thead><tr><th>Equipo</th><th>Jugador</th><th>KDA</th><th>Rango SoloQ</th><th>PJ</th><th>Picks</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-renderPlayers(leaguePlayers);
-document.querySelector('#player-search').addEventListener('input', (event) => {
-  const query = event.target.value.trim().toLocaleLowerCase('es');
-  renderPlayers(leaguePlayers.filter((player) => [player.name, player.team, ...player.picks].join(' ').toLocaleLowerCase('es').includes(query)));
-});
+const playerSearch = document.querySelector('#player-search');
+const playerSort = document.querySelector('#player-sort');
+function updatePlayers() {
+  const query = playerSearch.value.trim().toLocaleLowerCase('es');
+  const filtered = leaguePlayers.filter((player) => [player.name, player.team, ...player.picks].join(' ').toLocaleLowerCase('es').includes(query));
+  filtered.sort((a, b) => {
+    if (playerSort.value === 'kda') return kdaRatio(b) - kdaRatio(a) || a.name.localeCompare(b.name, 'es');
+    if (playerSort.value === 'rank') return (soloQueueRanks[b.name] ? rankScore(soloQueueRanks[b.name]) : -1) - (soloQueueRanks[a.name] ? rankScore(soloQueueRanks[a.name]) : -1) || a.name.localeCompare(b.name, 'es');
+    return a.team.localeCompare(b.team, 'es') || a.name.localeCompare(b.name, 'es');
+  });
+  renderPlayers(filtered);
+}
+updatePlayers();
+playerSearch.addEventListener('input', updatePlayers);
+playerSort.addEventListener('change', updatePlayers);
 
 function renderLineup(game, team) {
   const lineup = game.lineups?.[team];

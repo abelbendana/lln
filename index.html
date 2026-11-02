@@ -109,8 +109,8 @@
 
       <section id="jugadores" class="content-section section-dark page-section">
         <div class="section-intro reveal"><p class="section-number">02</p><div><h2>Jugadores</h2><p>Participantes confirmados por alineaciones, con KDA medio, picks y acceso a OP.GG.</p></div></div>
-        <label class="search-box"><span>⌕</span><input id="player-search" type="search" placeholder="Buscar jugador, equipo o pick…" /></label>
-        <div id="players-grid" class="players-grid" aria-live="polite"></div>
+        <div class="players-toolbar"><label class="search-box"><span>⌕</span><input id="player-search" type="search" placeholder="Buscar jugador, equipo o pick…" /></label><label class="players-sort">Ordenar por<select id="player-sort"><option value="team">Equipo</option><option value="kda">KDA</option><option value="rank">Rango SoloQ</option></select></label></div>
+        <div id="players-grid" class="players-table-wrap" aria-live="polite"></div>
       </section>
 
       <section id="equipos" class="content-section page-section">
