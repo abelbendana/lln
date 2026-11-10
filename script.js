@@ -245,6 +245,17 @@ const games = [
   {date:'10–23 noviembre',a:'Chorbitos',b:'Monos Coruña',winner:null,week:'Jornada 6 · Pendiente'},
   {date:'10–23 noviembre',a:'Tarnished',b:'Maaa Nugueets',winner:null,week:'Jornada 6 · Pendiente'}
 ];
+
+const upcomingGames = games.filter((game) => !game.winner);
+const nextRoundName = upcomingGames[0]?.week.replace(/\s*·.*$/, '') || 'Próxima jornada';
+const nextRoundGames = upcomingGames.filter((game) => game.week.replace(/\s*·.*$/, '') === nextRoundName);
+const nextRoundDate = nextRoundGames[0]?.date.replace(/(\d)\s+([a-záéíóúñ]+)$/i, '$1 de $2');
+const heroNextRound = document.querySelector('#hero-next-round');
+if (heroNextRound && nextRoundGames.length) {
+  const fixtures = nextRoundGames.map((game) => `<p><span>${game.a}</span><b>VS</b><span>${game.b}</span></p>`).join('');
+  heroNextRound.innerHTML = `<p class="hero-kicker">Temporada 2026/27</p><h1>${nextRoundName}</h1><p class="hero-date">${nextRoundDate}</p><div class="hero-fixtures" aria-label="Próximos partidos">${fixtures}</div><a class="hero-cta" href="#calendario">Ver calendario <span aria-hidden="true">→</span></a>`;
+}
+
 const teamMembers = new Map();
 const playerStats = new Map();
 const lineupRoles = ['top','jungle','mid','adc','support'];
