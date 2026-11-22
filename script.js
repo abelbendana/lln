@@ -247,18 +247,25 @@ const games = [
 ];
 
 const roundName = (game) => game.week.replace(/\s*·.*$/, '');
+
+function renderHeroFixture(game) {
+  const renderTeam = (team) => {
+    const loserClass = game.winner && team !== game.winner ? ' class="fixture-loser"' : '';
+    return `<span${loserClass}><img src="${logo(team)}" alt="">${team}</span>`;
+  };
+  const resultLabel = game.winner ? ` role="group" aria-label="${game.a} contra ${game.b}. Victoria de ${game.winner}."` : '';
+  return `<p${resultLabel}>${renderTeam(game.a)}<b>VS</b>${renderTeam(game.b)}</p>`;
+}
+
 const upcomingGames = games.filter((game) => !game.winner);
 const nextRoundName = upcomingGames.length ? roundName(upcomingGames[0]) : 'Próxima jornada';
 const nextRoundGames = upcomingGames.filter((game) => roundName(game) === nextRoundName);
 const nextRoundDate = nextRoundGames[0]?.date.replace(/(\d)\s+([a-záéíóúñ]+)$/i, '$1 de $2');
 const heroNextRound = document.querySelector('#hero-next-round');
 if (heroNextRound && nextRoundGames.length) {
-  const fixtureTeam = (team) => `<span><img src="${logo(team)}" alt="">${team}</span>`;
   heroNextRound.querySelector('h1').textContent = nextRoundName;
   heroNextRound.querySelector('.hero-date').textContent = nextRoundDate;
-  heroNextRound.querySelector('.hero-fixtures').innerHTML = nextRoundGames.map((game) =>
-    `<p>${fixtureTeam(game.a)}<b>VS</b>${fixtureTeam(game.b)}</p>`
-  ).join('');
+  heroNextRound.querySelector('.hero-fixtures').innerHTML = nextRoundGames.map(renderHeroFixture).join('');
 }
 
 const playedGames = games.filter((game) => game.winner);
@@ -267,13 +274,7 @@ const latestResults = playedGames.filter((game) => roundName(game) === latestRou
 const heroResults = document.querySelector('#hero-results');
 if (latestResults.length) {
   document.querySelector('#hero-results-round').textContent = latestRound;
-  document.querySelector('#hero-results-slide .hero-cta').setAttribute('href', '#ultimos-resultados');
-  heroResults.innerHTML = latestResults.map((game) => {
-    const score = game.winner === game.a ? '1–0' : '0–1';
-    return `<article class="hero-result flip-teams" aria-label="${game.a} contra ${game.b}. Victoria de ${game.winner}.">
-      ${renderMatchTeam(game, game.a)}<b>${score}</b>${renderMatchTeam(game, game.b)}
-    </article>`;
-  }).join('');
+  heroResults.innerHTML = latestResults.map(renderHeroFixture).join('');
 } else {
   heroResults.textContent = 'Aún no hay resultados.';
 }
@@ -399,10 +400,10 @@ const soloQueuePeakRanks = {
 const rankTiers = ['Hierro','Bronce','Plata','Oro','Platino','Esmeralda','Diamante','Maestro','Gran Maestro','Challenger'];
 const romanDivision = (division) => ['','I','II','III','IV'][division] || '';
 const rankScore = (rank) => (rankTiers.indexOf(rank.tier) * 400) + (rank.division ? (4 - rank.division) * 100 : 0) + rank.lp;
-const formatRank = (rank, includeLp = false) => {
+const formatRank = (rank) => {
   if (rank === null) return 'Sin clasificar';
   if (!rank) return 'Pendiente';
-  const lp = includeLp || rankTiers.indexOf(rank.tier) >= rankTiers.indexOf('Maestro') ? ` · ${rank.lp} LP` : '';
+  const lp = rankTiers.indexOf(rank.tier) >= rankTiers.indexOf('Maestro') ? ` · ${rank.lp} LP` : '';
   return `${rank.tier}${rank.division ? ` ${romanDivision(rank.division)}` : ''}${lp}`;
 };
 
@@ -467,24 +468,32 @@ const eloChanges = leaguePlayers.flatMap((player) => {
   return [{player, previous, current, delta:rankScore(current) - rankScore(previous)}];
 });
 
-function renderEloLeaders(container, direction) {
-  const leaders = eloChanges.filter(({delta}) => direction * delta > 0)
-    .sort((a, b) => direction * (b.delta - a.delta) || a.player.name.localeCompare(b.player.name, 'es'))
+// Emblemas de https://static.developer.riotgames.com/docs/lol/ranked-emblems-latest.zip
+function renderRankBadge(rank, label) {
+  const division = romanDivision(rank.division);
+  const rankName = division ? `${rank.tier} ${division}` : rank.tier;
+  const points = `${rank.lp} LP`;
+  const description = `${label} · ${rankName} · ${points}`;
+  const emblem = rank.tier.toLowerCase().replaceAll(' ', '-');
+  return `<span class="elo-rank-badge" role="img" aria-label="${description}" title="${description}"><img src="assets/rangos/${emblem}.webp" alt=""><span>${rankName} <small>${points}</small></span></span>`;
+}
+
+function renderEloGainers(container) {
+  const leaders = eloChanges.filter(({delta}) => delta > 0)
+    .sort((a, b) => b.delta - a.delta || a.player.name.localeCompare(b.player.name, 'es'))
     .slice(0, 3);
   if (!leaders.length) {
-    container.textContent = direction > 0 ? 'Sin subidas en este periodo.' : 'Sin bajadas en este periodo.';
+    container.textContent = 'Sin subidas en este periodo.';
     return;
   }
   const rows = leaders.map(({player, previous, current, delta}) => `
-    <li><img src="${logo(player.team)}" alt="">
-      <div><a href="${opggUrl(player)}" target="_blank" rel="noopener">${player.name}</a>
-        <small><span>${formatRank(previous, true)}</span> → <span>${formatRank(current, true)}</span></small></div>
-      <strong>${delta > 0 ? '+' : '−'}${Math.abs(delta)} LP</strong>
+    <li><img class="elo-team-logo" src="${logo(player.team)}" alt="">
+      <div class="elo-player"><a href="${opggUrl(player)}" target="_blank" rel="noopener">${player.name}</a><strong class="elo-gain">+${delta} LP</strong></div>
+      <span class="elo-rank-change">${renderRankBadge(previous, 'Rango anterior')}<span aria-hidden="true">→</span>${renderRankBadge(current, 'Rango actual')}</span>
     </li>`).join('');
   container.innerHTML = `<ol>${rows}</ol>`;
 }
-renderEloLeaders(document.querySelector('#elo-gainers'), 1);
-renderEloLeaders(document.querySelector('#elo-losers'), -1);
+renderEloGainers(document.querySelector('#elo-gainers'));
 
 const hero = document.querySelector('#novedades');
 const heroControls = hero.querySelector('.hero-controls');
