@@ -2,7 +2,7 @@ document.documentElement.classList.add('js');
 
 const mainContent = document.querySelector('main');
 const pageOrder = [
-  document.querySelector('#inicio'),
+  document.querySelector('#novedades'),
   document.querySelector('#clasificacion'),
   document.querySelector('#calendario'),
   document.querySelector('#equipos'),
@@ -246,14 +246,36 @@ const games = [
   {date:'10–23 noviembre',a:'Tarnished',b:'Maaa Nugueets',winner:null,week:'Jornada 6 · Pendiente'}
 ];
 
+const roundName = (game) => game.week.replace(/\s*·.*$/, '');
 const upcomingGames = games.filter((game) => !game.winner);
-const nextRoundName = upcomingGames[0]?.week.replace(/\s*·.*$/, '') || 'Próxima jornada';
-const nextRoundGames = upcomingGames.filter((game) => game.week.replace(/\s*·.*$/, '') === nextRoundName);
+const nextRoundName = upcomingGames.length ? roundName(upcomingGames[0]) : 'Próxima jornada';
+const nextRoundGames = upcomingGames.filter((game) => roundName(game) === nextRoundName);
 const nextRoundDate = nextRoundGames[0]?.date.replace(/(\d)\s+([a-záéíóúñ]+)$/i, '$1 de $2');
 const heroNextRound = document.querySelector('#hero-next-round');
 if (heroNextRound && nextRoundGames.length) {
-  const fixtures = nextRoundGames.map((game) => `<p><span>${game.a}</span><b>VS</b><span>${game.b}</span></p>`).join('');
-  heroNextRound.innerHTML = `<p class="hero-kicker">Temporada 2026/27</p><h1>${nextRoundName}</h1><p class="hero-date">${nextRoundDate}</p><div class="hero-fixtures" aria-label="Próximos partidos">${fixtures}</div><a class="hero-cta" href="#calendario">Ver calendario <span aria-hidden="true">→</span></a>`;
+  const fixtureTeam = (team) => `<span><img src="${logo(team)}" alt="">${team}</span>`;
+  heroNextRound.querySelector('h1').textContent = nextRoundName;
+  heroNextRound.querySelector('.hero-date').textContent = nextRoundDate;
+  heroNextRound.querySelector('.hero-fixtures').innerHTML = nextRoundGames.map((game) =>
+    `<p>${fixtureTeam(game.a)}<b>VS</b>${fixtureTeam(game.b)}</p>`
+  ).join('');
+}
+
+const playedGames = games.filter((game) => game.winner);
+const latestRound = playedGames.length ? roundName(playedGames.at(-1)) : '';
+const latestResults = playedGames.filter((game) => roundName(game) === latestRound);
+const heroResults = document.querySelector('#hero-results');
+if (latestResults.length) {
+  document.querySelector('#hero-results-round').textContent = latestRound;
+  document.querySelector('#hero-results-slide .hero-cta').setAttribute('href', '#ultimos-resultados');
+  heroResults.innerHTML = latestResults.map((game) => {
+    const score = game.winner === game.a ? '1–0' : '0–1';
+    return `<article class="hero-result flip-teams" aria-label="${game.a} contra ${game.b}. Victoria de ${game.winner}.">
+      ${renderMatchTeam(game, game.a)}<b>${score}</b>${renderMatchTeam(game, game.b)}
+    </article>`;
+  }).join('');
+} else {
+  heroResults.textContent = 'Aún no hay resultados.';
 }
 
 const teamMembers = new Map();
@@ -323,7 +345,8 @@ const riotProfiles = {
   JONI:{gameName:'J0NI',tag:'SAD',status:'known'},
   TRPescadocanario:{tag:'316',status:'known'}, sam:{tag:'scp',status:'known'}
 };
-const soloQueueRanks = {
+// Rangos de SoloQ guardados el 10 de noviembre de 2026.
+const previousSoloQueueRanks = {
   eiboll:{tier:'Diamante',division:4,lp:82}, DrRedFlag:{tier:'Esmeralda',division:3,lp:79},
   'TR alex132mini':{tier:'Plata',division:1,lp:21}, Panker:{tier:'Maestro',lp:40},
   CANICHEMANIA63:{tier:'Diamante',division:1,lp:75}, Afelaino:{tier:'Hierro',division:1,lp:59},
@@ -339,29 +362,47 @@ const soloQueueRanks = {
   'Nómada':{tier:'Esmeralda',division:4,lp:28}, SobrinoRelax:{tier:'Plata',division:4,lp:49},
   ZaRg0t:{tier:'Platino',division:2,lp:78}, sam:{tier:'Esmeralda',division:2,lp:65}
 };
+const soloQueueRanks = {
+  eiboll:{tier:'Diamante',division:4,lp:95}, DrRedFlag:{tier:'Esmeralda',division:3,lp:79},
+  'TR alex132mini':{tier:'Oro',division:3,lp:75}, Panker:{tier:'Maestro',lp:111},
+  CANICHEMANIA63:{tier:'Diamante',division:1,lp:75}, Afelaino:{tier:'Hierro',division:1,lp:50},
+  Bochi:{tier:'Esmeralda',division:4,lp:94}, jadriab10:{tier:'Diamante',division:4,lp:90},
+  puminy:{tier:'Diamante',division:4,lp:36}, 'MNC Roicetee':{tier:'Oro',division:4,lp:49},
+  Iontxas:{tier:'Plata',division:2,lp:95}, Tugoldobello:{tier:'Plata',division:3,lp:90},
+  'TR Adria Kila':{tier:'Platino',division:4,lp:53}, 'TR Markos316':{tier:'Oro',division:2,lp:15},
+  'MKOI Keiwocky':{tier:'Oro',division:4,lp:59},
+  'General Panza':{tier:'Esmeralda',division:3,lp:41}, 'TR Arkinos':{tier:'Esmeralda',division:4,lp:0},
+  'TR Terminator':{tier:'Plata',division:3,lp:86}, Bolrich:{tier:'Diamante',division:3,lp:49},
+  Romera:{tier:'Diamante',division:2,lp:49}, miguelgimenez567:{tier:'Esmeralda',division:3,lp:53},
+  'Ñeñi Impact':{tier:'Platino',division:3,lp:46}, geko:{tier:'Oro',division:1,lp:21},
+  'Nómada':{tier:'Esmeralda',division:4,lp:28}, SobrinoRelax:{tier:'Plata',division:4,lp:46},
+  ZaRg0t:{tier:'Platino',division:2,lp:58},
+  JONI:null, TRPescadocanario:null, sam:{tier:'Diamante',division:4,lp:3}
+};
 const soloQueuePeakRanks = {
   eiboll:{tier:'Diamante',division:1,lp:10}, DrRedFlag:{tier:'Diamante',division:4,lp:83},
-  'TR alex132mini':{tier:'Plata',division:1,lp:21}, Panker:{tier:'Maestro',lp:40},
+  'TR alex132mini':{tier:'Oro',division:3,lp:75}, Panker:{tier:'Maestro',lp:172},
   CANICHEMANIA63:{tier:'Maestro',lp:42}, Afelaino:{tier:'Hierro',division:1,lp:84},
-  Bochi:{tier:'Esmeralda',division:2,lp:20}, jadriab10:{tier:'Diamante',division:3,lp:5},
+  Bochi:{tier:'Esmeralda',division:2,lp:20}, jadriab10:{tier:'Diamante',division:3,lp:30},
   puminy:{tier:'Diamante',division:3,lp:88}, 'MNC Roicetee':{tier:'Oro',division:4,lp:49},
   Iontxas:{tier:'Oro',division:2,lp:2}, Tugoldobello:{tier:'Plata',division:2,lp:90},
   'TR Adria Kila':{tier:'Platino',division:4,lp:73}, 'TR Markos316':{tier:'Oro',division:2,lp:47},
-  'MKOI Keiwocky':{tier:'Oro',division:2,lp:4}, 'General Panza':{tier:'Esmeralda',division:3,lp:23},
+  'MKOI Keiwocky':{tier:'Oro',division:2,lp:4}, 'General Panza':{tier:'Esmeralda',division:3,lp:62},
   'TR Arkinos':{tier:'Esmeralda',division:4,lp:47}, 'TR Terminator':{tier:'Plata',division:2,lp:2},
   Bolrich:{tier:'Diamante',division:1,lp:32}, Romera:{tier:'Maestro',lp:313},
-  miguelgimenez567:{tier:'Esmeralda',division:3,lp:80}, 'Ñeñi Impact':{tier:'Platino',division:3,lp:96},
-  geko:{tier:'Platino',division:4,lp:18}, 'Nómada':{tier:'Esmeralda',division:4,lp:58},
+  miguelgimenez567:{tier:'Esmeralda',division:2,lp:40}, 'Ñeñi Impact':{tier:'Platino',division:3,lp:96},
+  geko:{tier:'Esmeralda',division:4,lp:7}, 'Nómada':{tier:'Esmeralda',division:4,lp:58},
   SobrinoRelax:{tier:'Oro',division:2,lp:24},
-  ZaRg0t:{tier:'Esmeralda',division:4,lp:27}, JONI:{tier:'Plata',division:2,lp:15},
-  sam:{tier:'Esmeralda',division:2,lp:65}
+  ZaRg0t:{tier:'Esmeralda',division:4,lp:27},
+  JONI:null, TRPescadocanario:null, sam:{tier:'Diamante',division:4,lp:3}
 };
 const rankTiers = ['Hierro','Bronce','Plata','Oro','Platino','Esmeralda','Diamante','Maestro','Gran Maestro','Challenger'];
 const romanDivision = (division) => ['','I','II','III','IV'][division] || '';
 const rankScore = (rank) => (rankTiers.indexOf(rank.tier) * 400) + (rank.division ? (4 - rank.division) * 100 : 0) + rank.lp;
-const formatRank = (rank) => {
+const formatRank = (rank, includeLp = false) => {
+  if (rank === null) return 'Sin clasificar';
   if (!rank) return 'Pendiente';
-  const lp = rankTiers.indexOf(rank.tier) >= rankTiers.indexOf('Maestro') ? ` · ${rank.lp} LP` : '';
+  const lp = includeLp || rankTiers.indexOf(rank.tier) >= rankTiers.indexOf('Maestro') ? ` · ${rank.lp} LP` : '';
   return `${rank.tier}${rank.division ? ` ${romanDivision(rank.division)}` : ''}${lp}`;
 };
 
@@ -418,6 +459,97 @@ const opggUrl = (player) => {
   const gameName = profile?.gameName || player.name;
   return `https://op.gg/es/lol/summoners/euw/${encodeURIComponent(profile ? `${gameName}-${profile.tag}` : gameName)}`;
 };
+
+const eloChanges = leaguePlayers.flatMap((player) => {
+  const previous = previousSoloQueueRanks[player.name];
+  const current = soloQueueRanks[player.name];
+  if (!previous || !current) return [];
+  return [{player, previous, current, delta:rankScore(current) - rankScore(previous)}];
+});
+
+function renderEloLeaders(container, direction) {
+  const leaders = eloChanges.filter(({delta}) => direction * delta > 0)
+    .sort((a, b) => direction * (b.delta - a.delta) || a.player.name.localeCompare(b.player.name, 'es'))
+    .slice(0, 3);
+  if (!leaders.length) {
+    container.textContent = direction > 0 ? 'Sin subidas en este periodo.' : 'Sin bajadas en este periodo.';
+    return;
+  }
+  const rows = leaders.map(({player, previous, current, delta}) => `
+    <li><img src="${logo(player.team)}" alt="">
+      <div><a href="${opggUrl(player)}" target="_blank" rel="noopener">${player.name}</a>
+        <small><span>${formatRank(previous, true)}</span> → <span>${formatRank(current, true)}</span></small></div>
+      <strong>${delta > 0 ? '+' : '−'}${Math.abs(delta)} LP</strong>
+    </li>`).join('');
+  container.innerHTML = `<ol>${rows}</ol>`;
+}
+renderEloLeaders(document.querySelector('#elo-gainers'), 1);
+renderEloLeaders(document.querySelector('#elo-losers'), -1);
+
+const hero = document.querySelector('#novedades');
+const heroControls = hero.querySelector('.hero-controls');
+const heroSlides = [...hero.querySelectorAll('.hero-slide')];
+const heroPagination = hero.querySelector('.hero-pagination');
+const heroDots = heroSlides.map((slide, index) => {
+  const dot = document.createElement('button');
+  dot.type = 'button';
+  dot.setAttribute('aria-label', slide.getAttribute('aria-label'));
+  dot.setAttribute('aria-controls', slide.id);
+  dot.addEventListener('click', () => selectHeroSlide(index));
+  heroPagination.append(dot);
+  return dot;
+});
+const slideDurationMs = 3000;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let activeSlide = 0;
+let rotationStopped = false;
+let rotationTimer;
+
+function scheduleHeroRotation() {
+  clearTimeout(rotationTimer);
+  if (!rotationStopped && !reducedMotion.matches && !document.hidden && !heroSlides[activeSlide].contains(document.activeElement)) {
+    rotationTimer = setTimeout(() => showHeroSlide(activeSlide + 1), slideDurationMs);
+  }
+}
+function showHeroSlide(index) {
+  activeSlide = (index + heroSlides.length) % heroSlides.length;
+  heroSlides.forEach((slide, i) => {
+    slide.inert = i !== activeSlide;
+    heroDots[i].setAttribute('aria-current', String(i === activeSlide));
+  });
+  scheduleHeroRotation();
+}
+function selectHeroSlide(index) {
+  rotationStopped = true;
+  showHeroSlide(index);
+}
+heroControls.querySelector('.hero-previous').addEventListener('click', () => selectHeroSlide(activeSlide - 1));
+heroControls.querySelector('.hero-next').addEventListener('click', () => selectHeroSlide(activeSlide + 1));
+reducedMotion.addEventListener('change', scheduleHeroRotation);
+document.addEventListener('visibilitychange', scheduleHeroRotation);
+hero.addEventListener('focusin', scheduleHeroRotation);
+hero.addEventListener('focusout', () => queueMicrotask(scheduleHeroRotation));
+heroControls.addEventListener('keydown', (event) => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  selectHeroSlide(activeSlide + (event.key === 'ArrowRight' ? 1 : -1));
+});
+let swipeStart;
+hero.addEventListener('touchstart', (event) => {
+  swipeStart = event.touches.length === 1 ? event.touches[0] : null;
+}, {passive:true});
+hero.addEventListener('touchcancel', () => { swipeStart = null; });
+hero.addEventListener('touchend', (event) => {
+  if (!swipeStart) return;
+  const end = event.changedTouches[0];
+  const dx = end.clientX - swipeStart.clientX;
+  const dy = end.clientY - swipeStart.clientY;
+  swipeStart = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) showHeroSlide(activeSlide + (dx < 0 ? 1 : -1));
+}, {passive:true});
+heroControls.hidden = false;
+showHeroSlide(0);
+
 const riotIdLabel = (player) => {
   const profile = riotProfiles[player.name];
   if (!profile) return '<span class="riot-id unresolved">Tag pendiente</span>';
@@ -460,7 +592,7 @@ function renderPlayers(list) {
     const tooltip = description ? ` data-tooltip="${description}" aria-label="${description}"` : '';
     return `<th aria-sort="${active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}"><button type="button" class="table-sort${active ? ' active' : ''}" data-sort="${key}"${tooltip}>${label}<span aria-hidden="true">${indicator}</span></button></th>`;
   };
-  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA', 'Ratio de kills y asistencias por muerte')}${sortableHeader('participation', '% KP', 'Porcentaje de participación en las kills del equipo')}${sortableHeader('winrate', '% V', 'Porcentaje de victorias')}${sortableHeader('rank', 'SoloQ', 'Rango actual en SoloQ')}${sortableHeader('peakRank', 'Peak', 'Mejor rango alcanzado en SoloQ')}${sortableHeader('games', 'PJ', 'Partidas jugadas')}${sortableHeader('roles', 'Pos.', 'Número de posiciones distintas jugadas')}${sortableHeader('picks', 'Camp.', 'Número de campeones diferentes jugados')}</tr></thead><tbody>${rows}</tbody></table>`;
+  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA', 'Ratio de kills y asistencias por muerte')}${sortableHeader('participation', '% KP', 'Porcentaje de participación en las kills del equipo')}${sortableHeader('winrate', '% V', 'Porcentaje de victorias')}${sortableHeader('rank', 'SoloQ', 'Rango actual en SoloQ')}${sortableHeader('peakRank', 'Peak', 'Mejor rango de SoloQ de la temporada 2026 según OP.GG')}${sortableHeader('games', 'PJ', 'Partidas jugadas')}${sortableHeader('roles', 'Pos.', 'Número de posiciones distintas jugadas')}${sortableHeader('picks', 'Camp.', 'Número de campeones diferentes jugados')}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 const playerSearch = document.querySelector('#player-search');
@@ -505,7 +637,7 @@ playersGrid.addEventListener('click', (event) => {
   updatePlayers();
 });
 
-const completedGames = games.filter((game) => game.winner && game.lineups && game.duration);
+const completedGames = playedGames.filter((game) => game.lineups && game.duration);
 const currentTeams = [...document.querySelectorAll('.team-panel')].map((card) => card.dataset.team);
 const standings = currentTeams.map((team) => {
   const played = completedGames.filter((game) => game.a === team || game.b === team);
@@ -760,7 +892,7 @@ function renderMatchTeam(game, team) {
   return `<span class="match-team${resultClass}"><img src="${logo(team)}" alt=""><strong>${team}</strong></span>`;
 }
 
-document.querySelector('#matches-grid').innerHTML = games.map((game) => `<article class="flip-card${game.lineups ? ' has-details' : ''}${game.winner ? ' is-complete' : ''}" tabindex="0"><div class="flip-card-inner"><div class="flip-face"><p>${game.week}</p><div class="flip-teams">${renderMatchTeam(game, game.a)}<b>VS</b>${renderMatchTeam(game, game.b)}</div><div class="match-card-footer"><span>${game.lineups ? 'Ver alineaciones y KDA' : game.date}</span>${renderTwitchLink(game)}</div></div><div class="flip-face flip-back"><p class="match-result${game.winner ? ' is-winner' : ''}">${game.winner ? `✓ Victoria · ${game.winner}` : 'Partido pendiente'}</p>${renderMatchStats(game)}${game.lineups ? `<div class="match-lineups">${renderLineup(game, game.a)}${renderLineup(game, game.b)}</div>` : game.winner ? `<img src="${logo(game.winner)}" alt=""><h3>${game.winner}</h3>` : '<h3>Por disputar</h3>'}<div class="match-card-footer">${renderTwitchLink(game)}</div></div></div></article>`).join('');
+document.querySelector('#matches-grid').innerHTML = games.map((game) => `<article${game === latestResults[0] ? ' id="ultimos-resultados"' : ''} class="flip-card${game.lineups ? ' has-details' : ''}${game.winner ? ' is-complete' : ''}" tabindex="0"><div class="flip-card-inner"><div class="flip-face"><p>${game.week}</p><div class="flip-teams">${renderMatchTeam(game, game.a)}<b>VS</b>${renderMatchTeam(game, game.b)}</div><div class="match-card-footer"><span>${game.lineups ? 'Ver alineaciones y KDA' : game.date}</span>${renderTwitchLink(game)}</div></div><div class="flip-face flip-back"><p class="match-result${game.winner ? ' is-winner' : ''}">${game.winner ? `✓ Victoria · ${game.winner}` : 'Partido pendiente'}</p>${renderMatchStats(game)}${game.lineups ? `<div class="match-lineups">${renderLineup(game, game.a)}${renderLineup(game, game.b)}</div>` : game.winner ? `<img src="${logo(game.winner)}" alt=""><h3>${game.winner}</h3>` : '<h3>Por disputar</h3>'}<div class="match-card-footer">${renderTwitchLink(game)}</div></div></div></article>`).join('');
 document.querySelector('#matches-grid').addEventListener('click', (event) => {
   if (event.target.closest('a')) return;
   event.target.closest('.flip-card')?.classList.toggle('flipped');
