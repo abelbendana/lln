@@ -28,48 +28,51 @@
     </header>
 
     <main>
-      <section id="novedades" class="hero page-section" aria-roledescription="carrusel" aria-label="Novedades">
+      <section id="novedades" class="hero page-section" aria-labelledby="round-title">
         <span id="inicio" aria-hidden="true"></span>
-        <div class="hero-controls" role="group" aria-label="Controles del carrusel" hidden>
-          <button type="button" class="hero-previous" aria-label="Diapositiva anterior"></button>
-          <button type="button" class="hero-next" aria-label="Diapositiva siguiente"></button>
-        </div>
-        <div class="hero-inner hero-slide" id="hero-fixture-slide" role="group" aria-roledescription="diapositiva" aria-label="1 de 4 · Próximos partidos">
-          <div id="hero-next-round" class="hero-copy hero-round">
-            <p class="hero-kicker">Temporada 2026/27</p>
-            <h1>Jornada 6</h1>
-            <p class="hero-date">10–23 de noviembre</p>
-            <div class="hero-fixtures" aria-label="Próximos partidos">
-              <p><span><img src="assets/chorbitos.png" alt="" />Chorbitos</span><b>VS</b><span><img src="assets/monos-coruna.png" alt="" />Monos Coruña</span></p>
-              <p><span><img src="assets/tarnished.png" alt="" />Tarnished</span><b>VS</b><span><img src="assets/maaa-nugueets.png" alt="" />Maaa Nugueets</span></p>
+        <div class="matchday-layout">
+          <div class="round-lead" id="hero-next-round">
+            <p class="season-label">Temporada 2026/27 · Fase regular</p>
+            <h1 id="round-title">Jornada 6</h1>
+            <p class="round-dates">10–23 de noviembre</p>
+            <noscript><p>Chorbitos vs. Monos Coruña y Tarnished vs. Maaa Nugueets. Horarios por confirmar.</p></noscript>
+            <div id="upcoming-fixtures"></div>
+            <a class="text-action" href="#calendario">Ver calendario <span aria-hidden="true">→</span></a>
+          </div>
+          <section class="news-carousel" aria-roledescription="carrusel" aria-label="Más de la liga">
+            <div class="news-header">
+              <span>Más de la liga</span>
+              <div class="hero-controls" role="group" aria-label="Controles del carrusel" hidden>
+                <button type="button" class="hero-previous" aria-label="Diapositiva anterior"></button>
+                <button type="button" class="hero-next" aria-label="Diapositiva siguiente"></button>
+              </div>
             </div>
-            <a class="hero-cta" href="#calendario">Ver calendario <span aria-hidden="true">→</span></a>
-          </div>
+            <div class="news-slides">
+              <div class="news-results hero-slide" id="hero-results-slide" role="group" aria-roledescription="diapositiva" aria-label="1 de 3 · Últimos encuentros">
+                <p id="hero-results-round" class="news-kicker"></p>
+                <h2>Últimos encuentros</h2>
+                <div id="hero-results"></div>
+                <a class="text-action" href="#clasificacion">Ver clasificación <span aria-hidden="true">→</span></a>
+              </div>
+              <div class="hero-elo hero-slide" id="hero-elo-slide" role="group" aria-roledescription="diapositiva" aria-label="2 de 3 · Tryhardeando" inert>
+                <header class="elo-heading">
+                  <p class="news-kicker">SoloQ · EUW</p>
+                  <h2>Tryhardeando</h2>
+                  <p>Del <time datetime="2026-11-10">10</time> al <time datetime="2026-11-22">22 de noviembre de 2026</time></p>
+                </header>
+                <section class="elo-board"><h3>Mayores subidas</h3><div id="elo-gainers"></div></section>
+                <a class="text-action" href="#jugadores">Ver jugadores <span aria-hidden="true">→</span></a>
+              </div>
+              <div class="hero-champion hero-slide" id="hero-champion-slide" role="group" aria-roledescription="diapositiva" aria-label="3 de 3 · Campeón actual" inert>
+                <p class="news-kicker">Campeón actual</p>
+                <div class="crest-frame"><img src="assets/maaa-nugueets.png" alt="" /></div>
+                <h2>Maaa Nugueets</h2>
+                <a class="text-action" href="#palmares">Ver palmarés <span aria-hidden="true">→</span></a>
+              </div>
+            </div>
+            <div class="hero-pagination" role="group" aria-label="Elegir diapositiva"></div>
+          </section>
         </div>
-        <div class="hero-inner hero-slide" id="hero-results-slide" role="group" aria-roledescription="diapositiva" aria-label="2 de 4 · Últimos encuentros" inert>
-          <div class="hero-copy hero-round">
-            <p id="hero-results-round" class="hero-kicker"></p>
-            <h2>Últimos encuentros</h2>
-            <div id="hero-results" class="hero-fixtures"></div>
-            <a class="hero-cta" href="#clasificacion">Ver clasificación <span aria-hidden="true">→</span></a>
-          </div>
-        </div>
-        <div class="hero-elo hero-slide" id="hero-elo-slide" role="group" aria-roledescription="diapositiva" aria-label="3 de 4 · Tryhardeando" inert>
-          <header class="elo-heading">
-            <p class="hero-kicker">SoloQ · EUW</p>
-            <h2>Tryhardeando</h2>
-            <p>Del <time datetime="2026-11-10">10</time> al <time datetime="2026-11-22">22 de noviembre de 2026</time></p>
-          </header>
-          <section class="elo-board"><h3>Mayores subidas</h3><div id="elo-gainers"></div></section>
-          <a class="hero-cta" href="#jugadores">Ver jugadores <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="hero-champion hero-slide" id="hero-champion-slide" role="group" aria-roledescription="diapositiva" aria-label="4 de 4 · Campeón actual" inert>
-          <p class="hero-kicker">Campeón actual</p>
-          <div class="crest-frame"><img src="assets/maaa-nugueets.png" alt="" /></div>
-          <h2>Maaa Nugueets</h2>
-          <a class="hero-cta" href="#palmares">Ver palmarés <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="hero-pagination" role="group" aria-label="Elegir diapositiva"></div>
       </section>
 
       <section id="palmares" class="archive home-archive page-section" aria-labelledby="archive-title">
@@ -134,7 +137,9 @@
 
       <section id="jugadores" class="content-section section-dark page-section">
         <div class="section-intro reveal"><p class="section-number">04</p><div><h2>Jugadores</h2><p>El rango y el peak de SoloQ de la temporada 2026 se consultaron en OP.GG el 22 de noviembre.</p></div></div>
-        <div class="players-toolbar"><label class="search-box"><span>⌕</span><input id="player-search" type="search" placeholder="Buscar jugador, equipo o pick…" /></label><label class="players-sort">Ordenar por<select id="player-sort"><option value="team">Equipo</option><option value="name">Jugador</option><option value="kda" selected>KDA</option><option value="participation">% Participación de kills</option><option value="winrate">% Victoria</option><option value="rank">Rango SoloQ</option><option value="peakRank">Peak SoloQ</option><option value="games">PJ</option><option value="roles">Posiciones</option><option value="picks">Campeones</option></select></label></div>
+        <div class="players-toolbar"><label class="search-box"><span aria-hidden="true">⌕</span><input aria-label="Buscar jugador, equipo o pick" id="player-search" type="search" placeholder="Buscar jugador, equipo o pick…" /></label>
+          <label class="players-sort">Posición<select id="player-role"><option value="">Todas</option></select></label>
+          <label class="players-sort">Ordenar por<select id="player-sort"><option value="team">Equipo</option><option value="name">Jugador</option><option value="kda" selected>KDA</option><option value="participation">% Participación de kills</option><option value="winrate">% Victoria</option><option value="rank">Rango SoloQ</option><option value="peakRank">Peak SoloQ</option><option value="games">PJ</option><option value="roles">Posiciones</option><option value="picks">Campeones</option></select></label></div>
         <div id="players-grid" class="players-table-wrap" aria-live="polite"></div>
       </section>
 
@@ -151,7 +156,16 @@
 
       <section id="calendario" class="content-section section-dark page-section">
         <div class="section-intro reveal"><p class="section-number">02</p><div><h2>Calendario</h2><p>Temporada 2026/27 · Fechas, resultados, alineaciones, KDA y retransmisiones.</p></div></div>
-        <div id="matches-grid" class="matches-grid"></div>
+        <div id="matches-grid" class="calendar-rounds"></div>
+        <dialog id="match-dialog" aria-labelledby="match-title">
+          <button class="dialog-close" type="button" aria-label="Cerrar ficha" autofocus>×</button>
+          <div id="match-content"></div>
+          <div class="share-match">
+            <button type="button" class="match-action" id="copy-match">Copiar enlace</button>
+            <span role="status" id="copy-status"></span>
+            <input type="text" readonly hidden aria-label="Enlace al partido" id="match-url" />
+          </div>
+        </dialog>
       </section>
 
       <section id="estadisticas" class="content-section stats-section page-section">
@@ -163,7 +177,7 @@
       <section id="clasificacion" class="content-section section-dark page-section">
         <div class="section-intro reveal"><p class="section-number">01</p><div><h2>Clasificación</h2><p id="standings-status">Temporada 2026/27</p></div></div>
         <div id="standings-table" class="standings reveal" role="table" aria-label="Clasificación de equipos">
-          <div class="standing-head" role="row"><span>Pos.</span><span>Equipo</span><span>PJ</span><span>V</span><span>D</span><span>Pts.</span></div>
+          <div class="standing-head" role="row"><span role="columnheader">Pos.</span><span role="columnheader">Equipo</span><span role="columnheader">PJ</span><span role="columnheader">V</span><span role="columnheader">D</span><span role="columnheader">Pts.</span></div>
         </div>
         <div class="points-legend"><b>Puntuaciones</b><span>Victoria · 3 puntos</span><span>Derrota · 0 puntos</span><span>Desempate · enfrentamiento directo / BO1 si afecta a playoffs</span></div>
         <h3 class="playoff-title">Playoffs</h3>
@@ -184,5 +198,6 @@
       <p>© 2026 La Liga del Norte</p>
     </footer>
     <script src="script.js"></script>
+    <script src="matchday.js"></script>
   </body>
 </html>

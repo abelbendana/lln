@@ -15,7 +15,7 @@ pageOrder.forEach((section) => mainContent.append(section));
 if (window.location.hash) {
   if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
   window.addEventListener('load', () => {
-    window.requestAnimationFrame(() => document.querySelector(window.location.hash)?.scrollIntoView());
+    window.requestAnimationFrame(() => document.getElementById(window.location.hash.slice(1))?.scrollIntoView());
   }, {once:true});
 }
 
@@ -246,38 +246,7 @@ const games = [
   {date:'10–23 noviembre',a:'Tarnished',b:'Maaa Nugueets',winner:null,week:'Jornada 6 · Pendiente'}
 ];
 
-const roundName = (game) => game.week.replace(/\s*·.*$/, '');
-
-function renderHeroFixture(game) {
-  const renderTeam = (team) => {
-    const loserClass = game.winner && team !== game.winner ? ' class="fixture-loser"' : '';
-    return `<span${loserClass}><img src="${logo(team)}" alt="">${team}</span>`;
-  };
-  const resultLabel = game.winner ? ` role="group" aria-label="${game.a} contra ${game.b}. Victoria de ${game.winner}."` : '';
-  return `<p${resultLabel}>${renderTeam(game.a)}<b>VS</b>${renderTeam(game.b)}</p>`;
-}
-
-const upcomingGames = games.filter((game) => !game.winner);
-const nextRoundName = upcomingGames.length ? roundName(upcomingGames[0]) : 'Próxima jornada';
-const nextRoundGames = upcomingGames.filter((game) => roundName(game) === nextRoundName);
-const nextRoundDate = nextRoundGames[0]?.date.replace(/(\d)\s+([a-záéíóúñ]+)$/i, '$1 de $2');
-const heroNextRound = document.querySelector('#hero-next-round');
-if (heroNextRound && nextRoundGames.length) {
-  heroNextRound.querySelector('h1').textContent = nextRoundName;
-  heroNextRound.querySelector('.hero-date').textContent = nextRoundDate;
-  heroNextRound.querySelector('.hero-fixtures').innerHTML = nextRoundGames.map(renderHeroFixture).join('');
-}
-
 const playedGames = games.filter((game) => game.winner);
-const latestRound = playedGames.length ? roundName(playedGames.at(-1)) : '';
-const latestResults = playedGames.filter((game) => roundName(game) === latestRound);
-const heroResults = document.querySelector('#hero-results');
-if (latestResults.length) {
-  document.querySelector('#hero-results-round').textContent = latestRound;
-  heroResults.innerHTML = latestResults.map(renderHeroFixture).join('');
-} else {
-  heroResults.textContent = 'Aún no hay resultados.';
-}
 
 const teamMembers = new Map();
 const playerStats = new Map();
@@ -495,7 +464,7 @@ function renderEloGainers(container) {
 }
 renderEloGainers(document.querySelector('#elo-gainers'));
 
-const hero = document.querySelector('#novedades');
+const hero = document.querySelector('.news-carousel');
 const heroControls = hero.querySelector('.hero-controls');
 const heroSlides = [...hero.querySelectorAll('.hero-slide')];
 const heroPagination = hero.querySelector('.hero-pagination');
@@ -554,7 +523,7 @@ hero.addEventListener('touchend', (event) => {
   const dx = end.clientX - swipeStart.clientX;
   const dy = end.clientY - swipeStart.clientY;
   swipeStart = null;
-  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) showHeroSlide(activeSlide + (dx < 0 ? 1 : -1));
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) selectHeroSlide(activeSlide + (dx < 0 ? 1 : -1));
 }, {passive:true});
 heroControls.hidden = false;
 showHeroSlide(0);
@@ -579,12 +548,40 @@ const renderPlayerMetric = (count, singularLabel, pluralLabel, detail, content) 
   return `<div class="player-metric${hasDetail ? '' : ' is-empty'}"${hasDetail ? ' tabindex="0"' : ''} aria-label="${count} ${label}${hasDetail ? `: ${detail}` : ''}"><strong>${count}</strong>${hasDetail ? '<span class="player-metric-hint" aria-hidden="true">⌄</span>' : ''}${hasDetail ? `<div class="player-metric-popover" aria-hidden="true">${content}</div>` : ''}</div>`;
 };
 
+const compactPlayers = window.matchMedia('(max-width: 780px)');
+const playerRole = document.querySelector('#player-role');
+for (const role of roleIcons) playerRole.add(new Option(role.label, role.key));
+
+function renderCompactPlayer(player, index) {
+  const detailsId = `player-detail-${index}`;
+  const metrics = [
+    ['Participación en kills', formatKillParticipation(player)],
+    ['Victorias', formatWinRate(player)],
+    ['Rango SoloQ', formatRank(soloQueueRanks[player.name])],
+    ['Peak SoloQ', formatRank(soloQueuePeakRanks[player.name])],
+    ['Posiciones', playedRoles(player).map((role) => role.label).join(', ') || '—'],
+    ['Campeones', [...player.picks].join(', ') || '—'],
+    ['K / D / A por partida', [player.kills, player.deaths, player.assists].map((count) => average(count, player.games)).join(' / ')]
+  ];
+  return `
+    <tr class="compact-player">
+      <td><button type="button" class="expand-player" aria-expanded="false" aria-controls="${detailsId}">${player.name}${captainBadge(player.name)}</button></td>
+      <td><span class="compact-team"><img src="${logo(player.team)}" alt="">${player.team}</span></td>
+      <td class="player-kda"><strong>${formatRatio(kdaRatio(player))}</strong></td><td>${player.games}</td>
+    </tr>
+    <tr id="${detailsId}" class="player-detail" hidden><td colspan="4">
+      <dl>${metrics.map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>
+      <a class="text-action" href="${opggUrl(player)}" target="_blank" rel="noopener">Ver en OP.GG ${riotIdLabel(player)}</a>
+    </td></tr>`;
+}
+
 function renderPlayers(list) {
   if (!list.length) {
     playersGrid.innerHTML = '<p>No se encontraron jugadores.</p>';
     return;
   }
-  const rows = list.map((player) => {
+  const rows = list.map((player, index) => {
+    if (compactPlayers.matches) return renderCompactPlayer(player, index);
     const picks = [...player.picks];
     const rank = soloQueueRanks[player.name];
     const peakRank = soloQueuePeakRanks[player.name];
@@ -601,7 +598,14 @@ function renderPlayers(list) {
     const tooltip = description ? ` data-tooltip="${description}" aria-label="${description}"` : '';
     return `<th aria-sort="${active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}"><button type="button" class="table-sort${active ? ' active' : ''}" data-sort="${key}"${tooltip}>${label}<span aria-hidden="true">${indicator}</span></button></th>`;
   };
-  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${sortableHeader('team', 'Equipo')}${sortableHeader('name', 'Jugador')}${sortableHeader('kda', 'KDA', 'Ratio de kills y asistencias por muerte')}${sortableHeader('participation', '% KP', 'Porcentaje de participación en las kills del equipo')}${sortableHeader('winrate', '% V', 'Porcentaje de victorias')}${sortableHeader('rank', 'SoloQ', 'Rango actual en SoloQ')}${sortableHeader('peakRank', 'Peak', 'Mejor rango de SoloQ de la temporada 2026 según OP.GG')}${sortableHeader('games', 'PJ', 'Partidas jugadas')}${sortableHeader('roles', 'Pos.', 'Número de posiciones distintas jugadas')}${sortableHeader('picks', 'Camp.', 'Número de campeones diferentes jugados')}</tr></thead><tbody>${rows}</tbody></table>`;
+  const headers = compactPlayers.matches
+    ? [sortableHeader('name', 'Jugador'), sortableHeader('team', 'Equipo'), sortableHeader('kda', 'KDA'), sortableHeader('games', 'PJ')]
+    : [sortableHeader('team', 'Equipo'), sortableHeader('name', 'Jugador'), sortableHeader('kda', 'KDA', 'Ratio de kills y asistencias por muerte'),
+      sortableHeader('participation', '% KP', 'Porcentaje de participación en las kills del equipo'), sortableHeader('winrate', '% V', 'Porcentaje de victorias'),
+      sortableHeader('rank', 'SoloQ', 'Rango actual en SoloQ'), sortableHeader('peakRank', 'Peak', 'Mejor rango de SoloQ de la temporada 2026 según OP.GG'),
+      sortableHeader('games', 'PJ', 'Partidas jugadas'), sortableHeader('roles', 'Pos.', 'Número de posiciones distintas jugadas'),
+      sortableHeader('picks', 'Camp.', 'Número de campeones diferentes jugados')];
+  playersGrid.innerHTML = `<table class="players-table"><thead><tr>${headers.join('')}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 const playerSearch = document.querySelector('#player-search');
@@ -610,7 +614,9 @@ const playerSortState = {key:'kda',direction:'desc'};
 const defaultSortDirection = (key) => ['team', 'name'].includes(key) ? 'asc' : 'desc';
 function updatePlayers() {
   const query = playerSearch.value.trim().toLocaleLowerCase('es');
-  const filtered = leaguePlayers.filter((player) => [player.name, player.team, ...player.picks].join(' ').toLocaleLowerCase('es').includes(query));
+  const filtered = leaguePlayers.filter((player) =>
+    (!playerRole.value || player.roles.has(playerRole.value)) &&
+    [player.name, player.team, ...player.picks].join(' ').toLocaleLowerCase('es').includes(query));
   filtered.sort((a, b) => {
     const values = {
       team:[a.team, b.team], name:[a.name, b.name], kda:[kdaRatio(a), kdaRatio(b)],
@@ -629,12 +635,21 @@ function updatePlayers() {
 }
 updatePlayers();
 playerSearch.addEventListener('input', updatePlayers);
+playerRole.addEventListener('change', updatePlayers);
+compactPlayers.addEventListener('change', updatePlayers);
 playerSort.addEventListener('change', () => {
   playerSortState.key = playerSort.value;
   playerSortState.direction = defaultSortDirection(playerSort.value);
   updatePlayers();
 });
 playersGrid.addEventListener('click', (event) => {
+  const playerButton = event.target.closest('.compact-player')?.querySelector('.expand-player');
+  if (playerButton) {
+    const detail = document.getElementById(playerButton.getAttribute('aria-controls'));
+    detail.hidden = !detail.hidden;
+    playerButton.setAttribute('aria-expanded', String(!detail.hidden));
+    return;
+  }
   const button = event.target.closest('[data-sort]');
   if (!button) return;
   const key = button.dataset.sort;
@@ -647,17 +662,6 @@ playersGrid.addEventListener('click', (event) => {
 });
 
 const completedGames = playedGames.filter((game) => game.lineups && game.duration);
-const currentTeams = [...document.querySelectorAll('.team-panel')].map((card) => card.dataset.team);
-const standings = currentTeams.map((team) => {
-  const played = completedGames.filter((game) => game.a === team || game.b === team);
-  const wins = played.filter((game) => game.winner === team).length;
-  return {team, played:played.length, wins, losses:played.length - wins, points:wins * 3};
-}).sort((a, b) => b.points - a.points || b.wins - a.wins || a.team.localeCompare(b.team, 'es'));
-const completedRounds = Math.max(0, ...completedGames.map((game) => Number(game.week.match(/\d+/)?.[0] || 0)));
-document.querySelector('#standings-status').textContent = `Temporada 2026/27 · Tras ${completedRounds} jornadas`;
-document.querySelector('#standings-table').insertAdjacentHTML('beforeend', standings.map((entry, index) => `<div role="row"><b>${index + 1}</b><span><img src="${logo(entry.team)}" alt="">${entry.team}</span><span>${entry.played}</span><span>${entry.wins}</span><span>${entry.losses}</span><strong>${entry.points}</strong></div>`).join(''));
-const [leader, semifinalistA, semifinalistB] = standings;
-document.querySelector('#playoffs-bracket').innerHTML = `<div><p>Semifinal · Si terminase hoy</p><span><img src="${logo(semifinalistA.team)}" alt="">2.º ${semifinalistA.team}</span><span><img src="${logo(semifinalistB.team)}" alt="">3.º ${semifinalistB.team}</span></div><i>→</i><div><p>Gran Final</p><span><img src="${logo(leader.team)}" alt="">1.º ${leader.team}</span><span><img src="assets/wolf.png" alt="">Ganador semifinal</span></div>`;
 const durationInSeconds = (duration) => {
   const [minutes, seconds] = duration.split(':').map(Number);
   return (minutes * 60) + seconds;
@@ -871,43 +875,3 @@ document.querySelector('#stats-groups').innerHTML = statisticsGroups.map((group)
   const cards = group.items.map(renderStatisticCard).join('');
   return `<section class="stats-group"><div class="stats-group-heading"><div><span>${group.eyebrow}</span><h3>${group.title}</h3></div><b>${group.items.length} récords</b></div><div class="stats-grid">${cards}</div></section>`;
 }).join('');
-
-function renderLineup(game, team) {
-  const lineup = game.lineups?.[team];
-  if (!lineup) return '';
-  return `<section><h4>${team}</h4><ul>${lineup.map((player) => `<li><span><strong>${player.name}</strong><small>${player.champion || 'Campeón pendiente'}</small></span><b>${player.kda}</b></li>`).join('')}</ul></section>`;
-}
-
-function getTeamKda(game, team) {
-  return (game.lineups?.[team] || []).reduce((total, player) => {
-    const [kills, deaths, assists] = player.kda.split('/').map(Number);
-    return [total[0] + kills, total[1] + deaths, total[2] + assists];
-  }, [0, 0, 0]).join('/');
-}
-
-function renderMatchStats(game) {
-  if (!game.lineups) return '';
-  return `<div class="match-summary"><span>Duración <b>${game.duration || 'No visible'}</b></span><span>${game.a} <b>${getTeamKda(game, game.a)}</b></span><span>${game.b} <b>${getTeamKda(game, game.b)}</b></span></div>`;
-}
-
-function renderTwitchLink(game) {
-  if (game.twitch) return `<a class="twitch-link" href="${game.twitch}" target="_blank" rel="noopener">▶ Ver en Twitch</a>`;
-  if (game.winner) return '<span class="twitch-missing">Twitch no disponible</span>';
-  return '';
-}
-
-function renderMatchTeam(game, team) {
-  const resultClass = game.winner === team ? ' is-winner' : game.winner ? ' is-loser' : '';
-  return `<span class="match-team${resultClass}"><img src="${logo(team)}" alt=""><strong>${team}</strong></span>`;
-}
-
-document.querySelector('#matches-grid').innerHTML = games.map((game) => `<article${game === latestResults[0] ? ' id="ultimos-resultados"' : ''} class="flip-card${game.lineups ? ' has-details' : ''}${game.winner ? ' is-complete' : ''}" tabindex="0"><div class="flip-card-inner"><div class="flip-face"><p>${game.week}</p><div class="flip-teams">${renderMatchTeam(game, game.a)}<b>VS</b>${renderMatchTeam(game, game.b)}</div><div class="match-card-footer"><span>${game.lineups ? 'Ver alineaciones y KDA' : game.date}</span>${renderTwitchLink(game)}</div></div><div class="flip-face flip-back"><p class="match-result${game.winner ? ' is-winner' : ''}">${game.winner ? `✓ Victoria · ${game.winner}` : 'Partido pendiente'}</p>${renderMatchStats(game)}${game.lineups ? `<div class="match-lineups">${renderLineup(game, game.a)}${renderLineup(game, game.b)}</div>` : game.winner ? `<img src="${logo(game.winner)}" alt=""><h3>${game.winner}</h3>` : '<h3>Por disputar</h3>'}<div class="match-card-footer">${renderTwitchLink(game)}</div></div></div></article>`).join('');
-document.querySelector('#matches-grid').addEventListener('click', (event) => {
-  if (event.target.closest('a')) return;
-  event.target.closest('.flip-card')?.classList.toggle('flipped');
-});
-document.querySelector('#matches-grid').addEventListener('keydown', (event) => {
-  if (event.target.closest('a')) return;
-  if (['Enter',' '].includes(event.key)) event.target.closest('.flip-card')?.classList.toggle('flipped');
-});
-
