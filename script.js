@@ -243,21 +243,46 @@ const games = [
     ]
   }},
   {date:'10–23 noviembre',a:'Chorbitos',b:'Monos Coruña',winner:null,week:'Jornada 6 · Pendiente'},
-  {date:'10–23 noviembre',a:'Tarnished',b:'Maaa Nugueets',winner:null,week:'Jornada 6 · Pendiente'}
+  {date:'10–23 noviembre',a:'Tarnished',b:'Maaa Nugueets',winner:'Maaa Nugueets',week:'Jornada 6',duration:'36:20',lineups:{
+    'Tarnished':[
+      {name:'TR alex132mini',champion:'Gnar',kda:'8/8/13',level:20},
+      {name:'TR Arkinos',champion:'Wukong',kda:'12/8/10',level:17},
+      {name:'TRPescadocanario',champion:'Vladimir',kda:'2/11/10',level:17},
+      {name:'TR Markos316',champion:'Jhin',kda:'8/6/10',level:17},
+      {name:'TR Adria Kila',champion:'Bardo',kda:'2/11/13',level:15}
+    ],
+    'Maaa Nugueets':[
+      {name:'Macho Toretto',champion:'Dr. Mundo',kda:'5/5/7',level:19,substitute:true},
+      {name:'puminy',champion:'Jarvan IV',kda:'10/4/21',level:18},
+      {name:'eiboll',champion:'Anivia',kda:'13/5/13',level:18},
+      {name:'jadriab10',champion:'Twitch',kda:'14/9/6',level:16},
+      {name:'MKOI Keiwocky',champion:'Shen',kda:'2/9/19',level:15}
+    ]
+  }}
 ];
 
 const playedGames = games.filter((game) => game.winner);
 
 const teamMembers = new Map();
 const playerStats = new Map();
+function getPlayerStats(name) {
+  if (!playerStats.has(name)) {
+    playerStats.set(name, {name,team:null,games:0,wins:0,kills:0,deaths:0,assists:0,teamKills:0,picks:new Set(),roles:new Set()});
+  }
+  return playerStats.get(name);
+}
 const lineupRoles = ['top','jungle','mid','adc','support'];
 games.forEach((game) => {
   Object.entries(game.lineups || {}).forEach(([team, lineup]) => {
     const members = teamMembers.get(team) || new Set();
-    const teamKills = lineup.reduce((total, player) => total + Number(player.kda.split('/')[0]), 0);
+    const teamKills = game.winner ? lineupTotals(lineup).kills : 0;
     lineup.forEach((player, roleIndex) => {
-      members.add(player.name);
-      const stats = playerStats.get(player.name) || {name:player.name,team,games:0,wins:0,kills:0,deaths:0,assists:0,teamKills:0,picks:new Set(),roles:new Set()};
+      const stats = getPlayerStats(player.name);
+      if (!player.substitute) {
+        members.add(player.name);
+        stats.team ??= team;
+      }
+      if (!game.winner) return;
       const [kills, deaths, assists] = player.kda.split('/').map(Number);
       stats.games += 1;
       if (game.winner === team) stats.wins += 1;
@@ -267,7 +292,6 @@ games.forEach((game) => {
       stats.teamKills += teamKills;
       if (player.champion) stats.picks.add(player.champion);
       if (lineupRoles[roleIndex]) stats.roles.add(lineupRoles[roleIndex]);
-      playerStats.set(player.name, stats);
     });
     teamMembers.set(team, members);
   });
@@ -279,9 +303,7 @@ registeredPlayers.forEach((player) => {
   const members = teamMembers.get(player.team) || new Set();
   members.add(player.name);
   teamMembers.set(player.team, members);
-  if (!playerStats.has(player.name)) {
-    playerStats.set(player.name, {name:player.name,team:player.team,games:0,wins:0,kills:0,deaths:0,assists:0,teamKills:0,picks:new Set(),roles:new Set()});
-  }
+  getPlayerStats(player.name).team = player.team;
 });
 teamMembers.forEach((members, team) => teamMembers.set(team, [...members].sort((a, b) => a.localeCompare(b, 'es'))));
 
@@ -297,6 +319,7 @@ const captainBadge = (name) => captainPlayers.has(name)
   : '';
 
 const riotProfiles = {
+  'Macho Toretto':{tag:'EUW',status:'found'},
   eiboll:{tag:'eibol',status:'known'}, DrRedFlag:{tag:'EUW',status:'known'},
   'TR alex132mini':{tag:'ASF',status:'known'}, Panker:{tag:'MV3',status:'known'},
   CANICHEMANIA63:{tag:'nerf',status:'inferred'}, Afelaino:{tag:'9703',status:'inferred'},
@@ -333,6 +356,7 @@ const previousSoloQueueRanks = {
   ZaRg0t:{tier:'Platino',division:2,lp:78}, sam:{tier:'Esmeralda',division:2,lp:65}
 };
 const soloQueueRanks = {
+  'Macho Toretto':{tier:'Bronce',division:1,lp:68},
   eiboll:{tier:'Diamante',division:4,lp:95}, DrRedFlag:{tier:'Esmeralda',division:3,lp:79},
   'TR alex132mini':{tier:'Oro',division:3,lp:75}, Panker:{tier:'Maestro',lp:111},
   CANICHEMANIA63:{tier:'Diamante',division:1,lp:75}, Afelaino:{tier:'Hierro',division:1,lp:50},
@@ -350,6 +374,7 @@ const soloQueueRanks = {
   JONI:null, TRPescadocanario:null, sam:{tier:'Diamante',division:4,lp:3}
 };
 const soloQueuePeakRanks = {
+  'Macho Toretto':{tier:'Plata',division:4,lp:23},
   eiboll:{tier:'Diamante',division:1,lp:10}, DrRedFlag:{tier:'Diamante',division:4,lp:83},
   'TR alex132mini':{tier:'Oro',division:3,lp:75}, Panker:{tier:'Maestro',lp:172},
   CANICHEMANIA63:{tier:'Maestro',lp:42}, Afelaino:{tier:'Hierro',division:1,lp:84},
@@ -413,7 +438,9 @@ document.querySelectorAll('.team-panel').forEach((card) => {
   const captain = teamCaptains[card.dataset.team];
   card.insertAdjacentHTML('beforeend', `<div class="team-panel-rank"><span class="team-captain">★ Capitán · ${captain.player}</span><span>Rango promedio · mejores 5</span><strong>${rank}</strong></div>`);
 });
-const leaguePlayers = [...playerStats.values()].sort((a, b) => a.team.localeCompare(b.team, 'es') || a.name.localeCompare(b.name, 'es'));
+const playerTeamLabel = (player) => player.team ?? 'Suplente';
+const playerEmblem = (player) => player.team ? logo(player.team) : 'assets/wolf.png';
+const leaguePlayers = [...playerStats.values()].sort((a, b) => playerTeamLabel(a).localeCompare(playerTeamLabel(b), 'es') || a.name.localeCompare(b.name, 'es'));
 const formatNumber = (value, minimumFractionDigits = 1, maximumFractionDigits = minimumFractionDigits) => value.toLocaleString('es-ES', {minimumFractionDigits, maximumFractionDigits});
 const formatRatio = (value) => formatNumber(value, 2, 2);
 const average = (total, gamesPlayed) => gamesPlayed ? formatNumber(total / gamesPlayed) : '0,0';
@@ -422,7 +449,7 @@ const killParticipation = (player) => player.teamKills ? ((player.kills + player
 const winRate = (player) => player.games ? (player.wins / player.games) * 100 : null;
 const formatWinRate = (player) => winRate(player) === null ? '—' : `${Math.round(winRate(player))}%`;
 const formatKillParticipation = (player) => killParticipation(player) === null ? '—' : `${Math.round(killParticipation(player))}%`;
-const championSlug = (champion) => ({'Kai’Sa':'Kaisa','Bel’Veth':'Belveth','Cho’Gath':'Chogath','Dr. Mundo':'DrMundo','Jarvan IV':'JarvanIV','Lee Sin':'LeeSin','Tahm Kench':'TahmKench',Wukong:'MonkeyKing',LeBlanc:'Leblanc'}[champion] || champion.replace(/[^A-Za-z0-9]/g, ''));
+const championSlug = (champion) => ({'Kai’Sa':'Kaisa','Bel’Veth':'Belveth','Cho’Gath':'Chogath','Dr. Mundo':'DrMundo','Jarvan IV':'JarvanIV','Lee Sin':'LeeSin','Tahm Kench':'TahmKench',Wukong:'MonkeyKing',LeBlanc:'Leblanc',Bardo:'Bard'}[champion] || champion.replace(/[^A-Za-z0-9]/g, ''));
 const championIcon = (champion) => `https://ddragon.leagueoflegends.com/cdn/16.21.1/img/champion/${championSlug(champion)}.png`;
 const opggUrl = (player) => {
   const profile = riotProfiles[player.name];
@@ -456,7 +483,7 @@ function renderEloGainers(container) {
     return;
   }
   const rows = leaders.map(({player, previous, current, delta}) => `
-    <li><img class="elo-team-logo" src="${logo(player.team)}" alt="">
+    <li><img class="elo-team-logo" src="${playerEmblem(player)}" alt="">
       <div class="elo-player"><a href="${opggUrl(player)}" target="_blank" rel="noopener">${player.name}</a><strong class="elo-gain">+${delta} LP</strong></div>
       <span class="elo-rank-change">${renderRankBadge(previous, 'Rango anterior')}<span aria-hidden="true">→</span>${renderRankBadge(current, 'Rango actual')}</span>
     </li>`).join('');
@@ -566,7 +593,7 @@ function renderCompactPlayer(player, index) {
   return `
     <tr class="compact-player">
       <td><button type="button" class="expand-player" aria-expanded="false" aria-controls="${detailsId}">${player.name}${captainBadge(player.name)}</button></td>
-      <td><span class="compact-team"><img src="${logo(player.team)}" alt="">${player.team}</span></td>
+      <td><span class="compact-team"><img src="${playerEmblem(player)}" alt="">${playerTeamLabel(player)}</span></td>
       <td class="player-kda"><strong>${formatRatio(kdaRatio(player))}</strong></td><td>${player.games}</td>
     </tr>
     <tr id="${detailsId}" class="player-detail" hidden><td colspan="4">
@@ -589,7 +616,7 @@ function renderPlayers(list) {
     const roles = playedRoles(player);
     const roleMetric = renderPlayerMetric(roles.length, 'posición', 'posiciones', roles.map((role) => role.label).join(', '), renderRoleIcons(player));
     const pickMetric = renderPlayerMetric(picks.length, 'campeón', 'campeones', picks.join(', '), `<div class="player-picks">${pickIcons}</div>`);
-    return `<tr><td class="player-team-cell"><img src="${logo(player.team)}" alt=""><span>${player.team}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}${captainBadge(player.name)}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${formatRatio(kdaRatio(player))}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="player-kill-participation">${formatKillParticipation(player)}</td><td class="player-win-rate">${formatWinRate(player)}</td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td class="${peakRank ? 'has-rank' : 'rank-pending'}">${formatRank(peakRank)}</td><td>${player.games}</td><td class="player-metric-cell">${roleMetric}</td><td class="player-metric-cell">${pickMetric}</td></tr>`;
+    return `<tr><td class="player-team-cell"><img src="${playerEmblem(player)}" alt=""><span>${playerTeamLabel(player)}</span></td><td><a class="player-link" href="${opggUrl(player)}" target="_blank" rel="noopener"><strong>${player.name}${captainBadge(player.name)}</strong>${riotIdLabel(player)}</a></td><td class="player-kda"><strong>${formatRatio(kdaRatio(player))}</strong><small>${average(player.kills, player.games)} / ${average(player.deaths, player.games)} / ${average(player.assists, player.games)}</small></td><td class="player-kill-participation">${formatKillParticipation(player)}</td><td class="player-win-rate">${formatWinRate(player)}</td><td class="${rank ? 'has-rank' : 'rank-pending'}">${formatRank(rank)}</td><td class="${peakRank ? 'has-rank' : 'rank-pending'}">${formatRank(peakRank)}</td><td>${player.games}</td><td class="player-metric-cell">${roleMetric}</td><td class="player-metric-cell">${pickMetric}</td></tr>`;
   }).join('');
   const sortableHeader = (key, label, description = '') => {
     const active = playerSortState.key === key;
@@ -616,10 +643,10 @@ function updatePlayers() {
   const query = playerSearch.value.trim().toLocaleLowerCase('es');
   const filtered = leaguePlayers.filter((player) =>
     (!playerRole.value || player.roles.has(playerRole.value)) &&
-    [player.name, player.team, ...player.picks].join(' ').toLocaleLowerCase('es').includes(query));
+    [player.name, playerTeamLabel(player), ...player.picks].join(' ').toLocaleLowerCase('es').includes(query));
   filtered.sort((a, b) => {
     const values = {
-      team:[a.team, b.team], name:[a.name, b.name], kda:[kdaRatio(a), kdaRatio(b)],
+      team:[playerTeamLabel(a), playerTeamLabel(b)], name:[a.name, b.name], kda:[kdaRatio(a), kdaRatio(b)],
       participation:[killParticipation(a) ?? -1, killParticipation(b) ?? -1],
       winrate:[winRate(a) ?? -1, winRate(b) ?? -1],
       rank:[soloQueueRanks[a.name] ? rankScore(soloQueueRanks[a.name]) : -1, soloQueueRanks[b.name] ? rankScore(soloQueueRanks[b.name]) : -1],
@@ -687,13 +714,15 @@ const selectLeaders = (entries, getter, direction = 'max') => {
     .filter((entry) => entry.games === mostGames)
     .sort((a, b) => a.name.localeCompare(b.name, 'es'));
 };
-const lineupTotals = (lineup) => lineup.reduce((totals, player) => {
-  const [kills, deaths, assists] = player.kda.split('/').map(Number);
-  totals.kills += kills;
-  totals.deaths += deaths;
-  totals.assists += assists;
-  return totals;
-}, {kills:0, deaths:0, assists:0});
+function lineupTotals(lineup) {
+  return lineup.reduce((totals, player) => {
+    const [kills, deaths, assists] = player.kda.split('/').map(Number);
+    totals.kills += kills;
+    totals.deaths += deaths;
+    totals.assists += assists;
+    return totals;
+  }, {kills:0, deaths:0, assists:0});
+}
 
 const championStats = new Map();
 completedGames.forEach((game) => {
@@ -795,7 +824,7 @@ const championCard = (title, champions, value, detail) => ({
 });
 const playerCard = (title, players, value, detail) => ({
   title, value, detail, kind:'player', leaders:players.map((player) => ({
-    name:player.name, image:logo(player.team), imageAlt:`Escudo de ${player.team}`
+    name:player.name, image:playerEmblem(player), imageAlt:player.team ? `Escudo de ${player.team}` : 'Escudo de la liga'
   }))
 });
 const teamCard = (title, teams, value, detail) => ({
@@ -871,6 +900,7 @@ function renderStatisticCard(item) {
   return `<article class="stat-card stat-card-${item.kind}${hasTiedLeaders ? ' stat-card-tied' : ''}"><header><h4>${item.title}</h4></header>${renderStatMedia(item)}<div class="stat-card-copy">${hasTiedLeaders ? '' : `<h5>${subject}</h5>`}<strong>${item.value}</strong><p>${item.detail}</p></div></article>`;
 }
 
+document.querySelector('#records-sample').textContent = ` · ${completedGames.length} ${completedGames.length === 1 ? 'partido con estadísticas' : 'partidos con estadísticas'}`;
 document.querySelector('#stats-groups').innerHTML = statisticsGroups.map((group) => {
   const cards = group.items.map(renderStatisticCard).join('');
   return `<section class="stats-group"><div class="stats-group-heading"><div><span>${group.eyebrow}</span><h3>${group.title}</h3></div><b>${group.items.length} récords</b></div><div class="stats-grid">${cards}</div></section>`;

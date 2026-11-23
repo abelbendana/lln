@@ -185,8 +185,12 @@ function renderLineups(game) {
   return `<div class="match-lineups">${[game.a, game.b].map((team) => {
     const lineup = game.lineups[team] || [];
     const total = lineupTotals(lineup);
+    const players = lineup.map((player) => {
+      const level = player.level ? ` · Nivel ${player.level}` : '';
+      return `<li><span><strong>${player.name}</strong><small>${player.champion || 'Campeón pendiente'}${level}</small></span><b>${player.kda}</b></li>`;
+    }).join('');
     return `<section><h4>${team}</h4><p class="lineup-total">K / D / A · ${total.kills} / ${total.deaths} / ${total.assists}</p>
-      <ul>${lineup.map((player) => `<li><span><strong>${player.name}</strong><small>${player.champion || 'Campeón pendiente'}</small></span><b>${player.kda}</b></li>`).join('')}</ul></section>`;
+      <ul>${players}</ul></section>`;
   }).join('')}</div>`;
 }
 
