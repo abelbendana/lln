@@ -64,6 +64,9 @@ function rankTeams(results) {
 }
 
 const standings = rankTeams(decidedGames);
+const semifinalPreview = !pending.length && standings.slice(0, 3).every((row) => row.tied === 1)
+  ? document.getElementById(`partido-semifinal-${slug(standings[1].team)}-${slug(standings[2].team)}`)
+  : null;
 
 function matchNotes(fixture) {
   // En el cierre de la fase solo quedan como máximo cuatro combinaciones.
@@ -123,8 +126,23 @@ function renderPlayoffBracket() {
     return `<span><img src="${row.tied === 1 ? logo(row.team) : 'assets/wolf.png'}" alt="">${index + 1}.º ${label}</span>`;
   };
   return `
-    <div><p>Semifinal${pending.length ? ' · Si terminase hoy' : ''}</p>${seed(1)}${seed(2)}</div><i aria-hidden="true">→</i>
+    <div><p>Semifinal${pending.length ? ' · Si terminase hoy' : ''}</p>${seed(1)}${seed(2)}
+      ${semifinalPreview ? `<a class="text-action" href="#${semifinalPreview.id}">Previa de la semifinal →</a>` : ''}</div><i aria-hidden="true">→</i>
     <div><p>Gran final</p>${seed(0)}<span><img src="assets/wolf.png" alt="">Ganador de la semifinal</span></div>`;
+}
+
+function renderTopMatchup() {
+  const playerSide = (name, displayName) => {
+    const team = playerStats.get(name).team;
+    return `<div class="top-player">
+      <img class="top-crest" src="${logo(team)}" alt="">
+      <span class="top-team">${team}</span><strong class="top-name">${displayName}</strong>
+      ${renderRankBadge(soloQueueRanks[name], 'Rango SoloQ')}
+      <small class="top-peak">Peak · ${formatRank(soloQueuePeakRanks[name])}</small>
+    </div>`;
+  };
+  return `<div class="top-matchup">${playerSide('CANICHEMANIA63', 'Caniche')}
+    <b class="top-versus" aria-hidden="true">VS</b>${playerSide('Panker', 'Panker')}</div>`;
 }
 
 function renderVersus(game) {
@@ -161,6 +179,17 @@ function fixtureCard(game, id = '') {
 
 function renderRoundLead() {
   const fixtures = document.querySelector('#upcoming-fixtures');
+  if (semifinalPreview) {
+    const finalist = standings[0].team;
+    fixtures.innerHTML = `<a class="semifinal-feature" href="#${semifinalPreview.id}">
+      <div class="semifinal-banner">Semifinal</div>
+      ${renderVersus({a:standings[1].team, b:standings[2].team})}
+      <div class="semifinal-action">Ver la previa de la semifinal <b aria-hidden="true">→</b></div>
+    </a>
+    <div class="finalist-strip"><img src="${logo(finalist)}" alt=""><div><strong>Gran final</strong>
+      <p>${finalist} vs. ganador de la semifinal</p></div></div>`;
+    return;
+  }
   if (!pending.length) {
     fixtures.innerHTML = `<div class="bracket">${renderPlayoffBracket()}</div>`;
     return;
@@ -243,17 +272,23 @@ function renderMatch(game) {
     <section class="match-section"><h3>Último enfrentamiento directo</h3>
       ${headToHead ? `<p>Jornada ${roundNumber(headToHead)} · ${resultText(headToHead)}</p>${renderLineups(headToHead)}`
         : '<p>Primer cruce entre los dos equipos esta temporada.</p>'}</section>`;
-  matchUrl.hidden = true;
-  copyStatus.textContent = '';
 }
 
 function syncMatchDialog() {
-  const game = matchesById.get(location.hash.slice(1));
-  if (!game) {
+  const id = location.hash.slice(1);
+  const game = matchesById.get(id);
+  if (semifinalPreview && id === semifinalPreview.id) {
+    const preview = semifinalPreview.content.cloneNode(true);
+    preview.querySelector('.semifinal-matchup').innerHTML = renderTopMatchup();
+    document.querySelector('#match-content').replaceChildren(preview);
+  } else if (game) {
+    renderMatch(game);
+  } else {
     if (matchDialog.open) matchDialog.close();
     return;
   }
-  renderMatch(game);
+  matchUrl.hidden = true;
+  copyStatus.textContent = '';
   if (!matchDialog.open) matchDialog.showModal();
   matchDialog.scrollTop = 0;
 }
@@ -270,10 +305,13 @@ function dismissMatch() {
   if (history.state?.matchOpenedHere) {
     history.back();
   } else {
-    history.replaceState(null, '', '#calendario');
+    const fromSemifinal = semifinalPreview && location.hash === `#${semifinalPreview.id}`;
+    const section = fromSemifinal ? '#novedades' : '#calendario';
+    history.replaceState(null, '', section);
     matchDialog.close();
-    document.querySelector('#calendario').scrollIntoView();
-    document.querySelector('.calendar-round summary')?.focus({preventScroll:true});
+    document.querySelector(section).scrollIntoView();
+    const returnTo = fromSemifinal ? `#upcoming-fixtures a[href="#${semifinalPreview.id}"]` : '.calendar-round summary';
+    document.querySelector(returnTo)?.focus({preventScroll:true});
   }
 }
 matchDialog.querySelector('.dialog-close').addEventListener('click', dismissMatch);
