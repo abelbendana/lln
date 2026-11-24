@@ -78,7 +78,8 @@ h1,h2,h3 { font-family:"Barlow Condensed",Impact,sans-serif; text-transform:uppe
 .hero-slide h2 { font-size:clamp(32px,3.2vw,48px); line-height:.98; letter-spacing:-.015em; }
 .hero-slide > .text-action { margin-top:auto; padding-top:10px; align-self:flex-start; }
 #hero-results { border-top:1px solid #354156; margin-top:6px; }
-#hero-results .duel-link { padding:16px 0; border-bottom:1px solid #354156; }
+#hero-results > * { padding:16px 0; border-bottom:1px solid #354156; }
+#hero-results small { display:block; margin-top:6px; color:#b4c1d2; }
 #hero-results .duel-team { font-size:clamp(15px,1.45vw,21px); }
 #hero-results .duel-team img { width:36px; height:36px; }
 .hero-pagination { justify-content:center; gap:0; padding-bottom:6px; }

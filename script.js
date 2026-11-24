@@ -242,7 +242,7 @@ const games = [
       {name:'geko',champion:'Karma',kda:'1/8/7'}
     ]
   }},
-  {date:'10–23 noviembre',a:'Chorbitos',b:'Monos Coruña',winner:null,week:'Jornada 6 · Pendiente'},
+  {date:'10–23 noviembre',a:'Chorbitos',b:'Monos Coruña',winner:'Monos Coruña',forfeitedBy:'Chorbitos',week:'Jornada 6'},
   {date:'10–23 noviembre',a:'Tarnished',b:'Maaa Nugueets',winner:'Maaa Nugueets',week:'Jornada 6',duration:'36:20',lineups:{
     'Tarnished':[
       {name:'TR alex132mini',champion:'Gnar',kda:'8/8/13',level:20},
@@ -261,7 +261,8 @@ const games = [
   }}
 ];
 
-const playedGames = games.filter((game) => game.winner);
+const decidedGames = games.filter((game) => game.winner);
+const playedGames = decidedGames.filter((game) => !game.forfeitedBy);
 
 const teamMembers = new Map();
 const playerStats = new Map();
@@ -273,6 +274,7 @@ function getPlayerStats(name) {
 }
 const lineupRoles = ['top','jungle','mid','adc','support'];
 games.forEach((game) => {
+  if (game.forfeitedBy) return;
   Object.entries(game.lineups || {}).forEach(([team, lineup]) => {
     const members = teamMembers.get(team) || new Set();
     const teamKills = game.winner ? lineupTotals(lineup).kills : 0;

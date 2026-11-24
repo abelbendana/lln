@@ -4,11 +4,11 @@ const roundNumber = (game) => Number(game.week.match(/\d+/)[0]);
 const hasTeam = (game, team) => game.a === team || game.b === team;
 const slug = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 const matchId = (game) => `partido-j${roundNumber(game)}-${slug(game.a)}-${slug(game.b)}`;
-const matchesById = new Map(games.map((game) => [matchId(game), game]));
+const matchesById = new Map(games.filter((game) => !game.forfeitedBy).map((game) => [matchId(game), game]));
 const rounds = [...new Set(games.map(roundNumber))].sort((a, b) => a - b);
 const pending = games.filter((game) => !game.winner);
 const currentRound = pending.length ? Math.min(...pending.map(roundNumber)) : rounds.at(-1);
-const latestPlayedRound = playedGames.length ? Math.max(...playedGames.map(roundNumber)) : null;
+const latestResultRound = decidedGames.length ? Math.max(...decidedGames.map(roundNumber)) : null;
 const inRound = (number) => games.filter((game) => roundNumber(game) === number);
 const currentTeams = [...document.querySelectorAll('.team-panel')].map((card) => card.dataset.team);
 const formattedTime = new Intl.DateTimeFormat('es-ES', {
@@ -63,7 +63,7 @@ function rankTeams(results) {
   return ranking;
 }
 
-const standings = rankTeams(playedGames);
+const standings = rankTeams(decidedGames);
 
 function matchNotes(fixture) {
   // En el cierre de la fase solo quedan como máximo cuatro combinaciones.
@@ -74,13 +74,13 @@ function matchNotes(fixture) {
   for (const game of [fixture, ...pending.filter((other) => other !== fixture)]) {
     outcomes = outcomes.flatMap((results) => [game.a, game.b].map((winner) => [...results, {...game, winner}]));
   }
-  const scenarios = outcomes.map((results) => ({results, table:rankTeams([...playedGames, ...results])}));
+  const scenarios = outcomes.map((results) => ({results, table:rankTeams([...decidedGames, ...results])}));
   const first = scenarios[0].table[0].team;
   const notes = [];
   if (hasTeam(fixture, first) && scenarios.every(({table}) => table[0].team === first && table[0].tied === 1)) {
     const levelOnPoints = scenarios.map(({table}) => table).find(([leader, runnerUp]) => leader.points === runnerUp.points);
     const rival = levelOnPoints?.[1].team;
-    const direct = playedGames.filter((game) => hasTeam(game, first) && hasTeam(game, rival));
+    const direct = decidedGames.filter((game) => hasTeam(game, first) && hasTeam(game, rival));
     const reason = direct.length === 2 && direct.every((game) => game.winner === first)
       ? ` gracias al 2–0 ante ${rival}` : '';
     notes.push(`<strong>${first}</strong> ya tiene plaza en la gran final${reason}.`);
@@ -105,18 +105,24 @@ function matchNotes(fixture) {
 
 function renderStandings() {
   const completeRounds = rounds.filter((number) => inRound(number).every((game) => game.winner)).length;
-  document.querySelector('#standings-status').textContent = `Temporada 2026/27 · ${completeRounds} jornadas completas · ${playedGames.length} partidos disputados`;
+  const forfeits = decidedGames.length - playedGames.length;
+  const forfeitCount = forfeits ? ` · ${forfeits} por incomparecencia` : '';
+  document.querySelector('#standings-status').textContent = `Temporada 2026/27 · ${completeRounds} jornadas completas · ${playedGames.length} partidos disputados${forfeitCount}`;
   document.querySelector('#standings-table').insertAdjacentHTML('beforeend', standings.map((row) => `
     <div role="row"><b role="cell">${row.position}${row.tied > 1 ? '=' : ''}</b>
     <span role="cell"><img src="${logo(row.team)}" alt="">${row.team}</span><span role="cell">${row.played}</span>
     <span role="cell">${row.wins}</span><span role="cell">${row.losses}</span><strong role="cell">${row.points}</strong></div>`).join(''));
+  document.querySelector('#playoffs-bracket').innerHTML = renderPlayoffBracket();
+}
+
+function renderPlayoffBracket() {
   const seed = (index) => {
     const row = standings[index];
     const names = standings.filter((entry) => entry.position === row.position).map((entry) => entry.team);
     const label = row.tied === 1 ? row.team : `Desempate · ${names.join(' / ')}`;
     return `<span><img src="${row.tied === 1 ? logo(row.team) : 'assets/wolf.png'}" alt="">${index + 1}.º ${label}</span>`;
   };
-  document.querySelector('#playoffs-bracket').innerHTML = `
+  return `
     <div><p>Semifinal${pending.length ? ' · Si terminase hoy' : ''}</p>${seed(1)}${seed(2)}</div><i aria-hidden="true">→</i>
     <div><p>Gran final</p>${seed(0)}<span><img src="assets/wolf.png" alt="">Ganador de la semifinal</span></div>`;
 }
@@ -131,36 +137,58 @@ function twitchLink(game) {
   return game.twitch ? `<a class="twitch-link" href="${game.twitch}" target="_blank" rel="noopener">Ver en Twitch <span aria-hidden="true">↗</span></a>` : '';
 }
 
+function resultDetail(game) {
+  if (game.forfeitedBy) return `Incomparecencia de ${game.forfeitedBy}`;
+  return game.duration ? `${game.duration} min` : '';
+}
+
+function resultText(game) {
+  return [`Victoria de ${game.winner}`, resultDetail(game)].filter(Boolean).join(' · ');
+}
+
 function fixtureCard(game, id = '') {
   const action = game.winner ? (game.lineups ? 'Ver alineaciones' : 'Ver ficha') : 'Ver previa';
+  const detail = resultDetail(game);
   const meta = game.winner
-    ? `<span class="match-result">Victoria de <strong>${game.winner}</strong></span>${game.duration ? `<span class="match-time">${game.duration} min</span>` : ''}`
+    ? `<span class="match-result">Victoria de <strong>${game.winner}</strong></span>${detail ? `<span class="match-time">${detail}</span>` : ''}`
     : renderSchedule(game);
   return `<article class="fixture-card"${id ? ` id="${id}"` : ''}>
-    <a class="duel-link" href="#${matchId(game)}" aria-label="${action} de ${game.a} contra ${game.b}">${renderVersus(game)}</a>
+    ${game.forfeitedBy ? renderVersus(game) : `<a class="duel-link" href="#${matchId(game)}" aria-label="${action} de ${game.a} contra ${game.b}">${renderVersus(game)}</a>`}
     <div class="fixture-meta">${meta}</div>
-    <div class="fixture-actions"><a class="text-action" href="#${matchId(game)}">${action} <span aria-hidden="true">→</span></a>${twitchLink(game)}</div>
+    ${game.forfeitedBy ? '' : `<div class="fixture-actions"><a class="text-action" href="#${matchId(game)}">${action} <span aria-hidden="true">→</span></a>${twitchLink(game)}</div>`}
   </article>`;
 }
 
 function renderRoundLead() {
+  const fixtures = document.querySelector('#upcoming-fixtures');
+  if (!pending.length) {
+    fixtures.innerHTML = `<div class="bracket">${renderPlayoffBracket()}</div>`;
+    return;
+  }
   const round = inRound(currentRound);
   const upcoming = round.filter((game) => !game.winner).sort((a, b) =>
     (confirmedTime(a)?.getTime() ?? Infinity) - (confirmedTime(b)?.getTime() ?? Infinity));
   document.querySelector('#round-title').textContent = `Jornada ${currentRound}`;
-  document.querySelector('.round-dates').textContent = `${pending.length ? '' : 'Fase regular finalizada · '}${round[0].date.replace(/(\d) ([a-záéíóúñ]+)$/i, '$1 de $2')}`;
-  document.querySelector('#upcoming-fixtures').innerHTML = (upcoming.length ? upcoming : round).map((game) => fixtureCard(game)).join('');
-  const results = latestPlayedRound ? inRound(latestPlayedRound).filter((game) => game.winner) : [];
-  document.querySelector('#hero-results-round').textContent = latestPlayedRound ? `Jornada ${latestPlayedRound}` : 'Fase regular';
-  document.querySelector('#hero-results').innerHTML = results.length ? results.map((game) => `
-    <a class="duel-link" href="#${matchId(game)}" aria-label="Ver ficha de ${game.a} contra ${game.b}. Victoria de ${game.winner}.">${renderVersus(game)}</a>`).join('') : '<p>Aún no hay resultados.</p>';
+  document.querySelector('.round-lead .season-label').textContent = 'Temporada 2026/27 · Fase regular';
+  document.querySelector('.round-dates').textContent = round[0].date.replace(/(\d) ([a-záéíóúñ]+)$/i, '$1 de $2');
+  fixtures.innerHTML = upcoming.map((game) => fixtureCard(game)).join('');
+}
+
+function renderLatestResults() {
+  const results = decidedGames.filter((game) => roundNumber(game) === latestResultRound);
+  document.querySelector('#hero-results-round').textContent = latestResultRound ? `Jornada ${latestResultRound}` : 'Fase regular';
+  document.querySelector('#hero-results').innerHTML = results.length ? results.map((game) => {
+    if (game.forfeitedBy) return `<div>${renderVersus(game)}<small>${resultDetail(game)}</small></div>`;
+    return `<a class="duel-link" href="#${matchId(game)}" aria-label="Ver ficha de ${game.a} contra ${game.b}. ${resultText(game)}.">
+      ${renderVersus(game)}</a>`;
+  }).join('') : '<p>Aún no hay resultados.</p>';
 }
 
 function renderCalendar() {
   const previous = rounds.filter((number) => number !== currentRound && inRound(number).every((game) => game.winner)).reverse();
   const remaining = rounds.filter((number) => number !== currentRound && !previous.includes(number));
   const order = [currentRound, ...previous.slice(0, 1), ...remaining, ...previous.slice(1)];
-  const latestResult = playedGames.find((game) => roundNumber(game) === latestPlayedRound);
+  const latestResult = decidedGames.find((game) => roundNumber(game) === latestResultRound);
   document.querySelector('#matches-grid').innerHTML = order.map((number) => {
     const round = inRound(number);
     return `<details class="calendar-round"${number === currentRound || number === previous[0] ? ' open' : ''}>
@@ -181,6 +209,7 @@ function renderForm(team, earlier) {
 }
 
 function renderLineups(game) {
+  if (game.forfeitedBy) return '';
   if (!game.lineups) return '<p>Las alineaciones están pendientes de publicación.</p>';
   return `<div class="match-lineups">${[game.a, game.b].map((team) => {
     const lineup = game.lineups[team] || [];
@@ -199,20 +228,20 @@ const copyStatus = document.querySelector('#copy-status');
 const matchUrl = document.querySelector('#match-url');
 function renderMatch(game) {
   const number = roundNumber(game);
-  const earlier = playedGames.filter((other) => roundNumber(other) < number).sort((a, b) => roundNumber(a) - roundNumber(b));
+  const earlier = decidedGames.filter((other) => roundNumber(other) < number).sort((a, b) => roundNumber(a) - roundNumber(b));
   const headToHead = earlier.filter((other) => hasTeam(other, game.a) && hasTeam(other, game.b)).at(-1);
-  const resultText = game.winner ? `Victoria de ${game.winner}${game.duration ? ` · ${game.duration} min` : ''}` : '';
+  const matchSection = game.winner
+    ? `<section class="match-section"><h3>Alineaciones y KDA</h3>${renderLineups(game)}</section>`
+    : `<section class="match-section"><h3>Qué se juega</h3><p>${matchNotes(game)}</p></section>`;
   document.querySelector('#match-content').innerHTML = `
     <p class="season-label">${game.winner ? 'Ficha' : 'Previa'} · Jornada ${number} · ${game.date}</p>
     <h2 id="match-title">${game.a} <small>vs.</small> ${game.b}</h2>
-    <div class="dialog-schedule">${game.winner ? `<strong>${resultText}</strong> ${twitchLink(game)}` : renderSchedule(game)}</div>
-    ${game.winner
-      ? `<section class="match-section"><h3>Alineaciones y KDA</h3>${renderLineups(game)}</section>`
-      : `<section class="match-section"><h3>Qué se juega</h3><p>${matchNotes(game)}</p></section>`}
+    <div class="dialog-schedule">${game.winner ? `<strong>${resultText(game)}</strong> ${twitchLink(game)}` : renderSchedule(game)}</div>
+    ${matchSection}
     <section class="match-section"><h3>Cómo llegan</h3><p>Últimos resultados antes de la jornada ${number}, del más antiguo al más reciente.</p>
       <div class="team-form">${renderForm(game.a, earlier)}${renderForm(game.b, earlier)}</div></section>
     <section class="match-section"><h3>Último enfrentamiento directo</h3>
-      ${headToHead ? `<p>Jornada ${roundNumber(headToHead)} · Victoria de <strong>${headToHead.winner}</strong>${headToHead.duration ? ` · ${headToHead.duration} min` : ''}</p>${renderLineups(headToHead)}`
+      ${headToHead ? `<p>Jornada ${roundNumber(headToHead)} · ${resultText(headToHead)}</p>${renderLineups(headToHead)}`
         : '<p>Primer cruce entre los dos equipos esta temporada.</p>'}</section>`;
   matchUrl.hidden = true;
   copyStatus.textContent = '';
@@ -271,5 +300,6 @@ document.querySelector('#copy-match').addEventListener('click', async () => {
 
 renderStandings();
 renderRoundLead();
+renderLatestResults();
 renderCalendar();
 syncMatchDialog();
