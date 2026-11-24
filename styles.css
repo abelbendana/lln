@@ -70,10 +70,12 @@ h1,h2,h3 { font-family:"Barlow Condensed",Impact,sans-serif; text-transform:uppe
 .top-matchup {
   position:relative; isolation:isolate; display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
 }
-.top-player { display:flex; flex-direction:column; align-items:center; gap:5px; min-width:0; padding:16px 8px 20px; text-align:center; }
-.top-crest { width:clamp(62px,6vw,86px); height:clamp(62px,6vw,86px); object-fit:contain; filter:drop-shadow(0 3px 6px #070f1c99); }
+.top-player { container-type:inline-size; display:flex; flex-direction:column; align-items:center; gap:5px; min-width:0; padding:16px 8px 20px; text-align:center; }
+.top-splash { display:block; width:100%; height:auto; }
+.top-team { display:flex; align-items:center; justify-content:center; gap:5px; }
+.top-team img { width:22px; height:22px; object-fit:contain; }
 .top-team,.top-peak { color:#c4cedc; font:600 12px/1.4 Inter,system-ui,sans-serif; }
-.top-name { font:800 clamp(28px,3vw,42px)/1 "Barlow Condensed",Impact,sans-serif; text-transform:uppercase; }
+.top-name { font:800 clamp(14px,12cqi,42px)/1 "Barlow Condensed",Impact,sans-serif; text-transform:uppercase; }
 .top-player .elo-rank-badge { display:flex; align-items:center; gap:6px; margin-top:4px; font-size:15px; }
 .top-player .elo-rank-badge img { width:34px; height:27px; }
 .top-player .elo-rank-badge small { display:inline; color:#d2d9e4; }

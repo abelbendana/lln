@@ -132,17 +132,17 @@ function renderPlayoffBracket() {
 }
 
 function renderTopMatchup() {
-  const playerSide = (name, displayName) => {
+  const playerSide = (name) => {
     const team = playerStats.get(name).team;
     return `<div class="top-player">
-      <img class="top-crest" src="${logo(team)}" alt="">
-      <span class="top-team">${team}</span><strong class="top-name">${displayName}</strong>
+      <span class="top-team"><img src="${logo(team)}" alt="">${team}</span>
+      <strong class="top-name">${name}</strong>
       ${renderRankBadge(soloQueueRanks[name], 'Rango SoloQ')}
       <small class="top-peak">Peak · ${formatRank(soloQueuePeakRanks[name])}</small>
     </div>`;
   };
-  return `<div class="top-matchup">${playerSide('CANICHEMANIA63', 'Caniche')}
-    <b class="top-versus" aria-hidden="true">VS</b>${playerSide('Panker', 'Panker')}</div>`;
+  return `${playerSide('CANICHEMANIA63')}
+    <b class="top-versus" aria-hidden="true">VS</b>${playerSide('Panker')}`;
 }
 
 function renderVersus(game) {
@@ -279,7 +279,7 @@ function syncMatchDialog() {
   const game = matchesById.get(id);
   if (semifinalPreview && id === semifinalPreview.id) {
     const preview = semifinalPreview.content.cloneNode(true);
-    preview.querySelector('.semifinal-matchup').innerHTML = renderTopMatchup();
+    preview.querySelector('.top-matchup').innerHTML = renderTopMatchup();
     document.querySelector('#match-content').replaceChildren(preview);
   } else if (game) {
     renderMatch(game);
